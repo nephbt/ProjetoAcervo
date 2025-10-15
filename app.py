@@ -54,7 +54,7 @@ def retornarLivros():
             ####################
 
 # POST de cadastro de usuario
-@app.route("/usuarios", methods=['Post'])
+@app.route("/usuarios/cadastro", methods=['Post'])
 def cadastrarUsuario():
     data = request.get_json()
     # data = request.form # EVENTUALMENTE, SUBSTITUIR O DE CIMA POR ESSE
@@ -68,7 +68,7 @@ def cadastrarUsuario():
     )
     return jsonify(cadastro.to_dict()), 201
 
-@app.route("/usuarios", methods=['Post'])
+@app.route("/usuarios/login", methods=['Post'])
 def login():
     data = request.get_json()
     # data = request.form # EVENTUALMENTE, SUBSTITUIR O DE CIMA POR ESSE
@@ -94,8 +94,8 @@ def retornarUsuarioId(usuario_id):
         return jsonify(usuario.to_dict()), 200
     return ({"Erro": "Usuário não encontrado"}), 404
 
-
-@app.route("usuario/", methods=['Get'])
+# GET de todos os usuarios
+@app.route("/usuarios", methods=['Get'])
 def retornarUsuario():
     return jsonify([usuario.to_dict() for usuario in bd.usuarios.values()]), 200
 

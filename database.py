@@ -98,7 +98,7 @@ class BancoDados:
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         cursor.execute(
-            "INSERT INTO livros (id, nome, email, senha, data_nasc) VALUES (?, ?, ?, ?, ?)",
+            "INSERT INTO usuarios (id, nome, email, senha, data_nasc) VALUES (?, ?, ?, ?, ?)",
             (id, nome, email, senha, data_nasc)
         )
 
