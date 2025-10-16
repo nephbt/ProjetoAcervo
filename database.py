@@ -27,6 +27,20 @@ def criar_tabelas(db_path='projeto_acervo'):
         )
     ''')
 
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS leituras (
+            id_usuario TEXT NOT NULL,
+            id_livro TEXT NOT NULL,
+            status TEXT NOT NULL,
+            avaliacao REAL,
+            data_leitura DATE,
+            comentario TEXT,
+            FOREIGN KEY (id_usuario) REFERENCES usuarios (id),
+            FOREIGN KEY (id_livro) REFERENCES livros (id),
+            PRIMARY KEY (id_usuario, id_livro)
+        )
+    ''')
+
     conn.commit()
     conn.close()
 
@@ -59,7 +73,7 @@ class BancoDados:
 
         conn.close()
 
-    def adicionarLivro(self, id, titulo, autor, genero, ano_publicacao):
+    def cadastrarLivro(self, id, titulo, autor, genero, ano_publicacao):
         livro = Livro(titulo, autor, genero, ano_publicacao)
 
         conn = sqlite3.connect(self.db_path)
@@ -70,9 +84,28 @@ class BancoDados:
         )
 
         conn.commit()
-        conn.close()
 
         self.livros[livro.id] = livro
+
+        conn.close()
+        return livro
+
+    def editarLivro(self, id, titulo, autor, genero, ano_publicacao):
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "UPDATE livros SET titulo = ?, autor = ?, genero = ?, ano_publicacao = ? WHERE id = ?",
+            (titulo, autor, genero, ano_publicacao, id)
+        )
+
+        conn.commit()
+
+
+        livro = Livro(titulo, autor, genero, ano_publicacao)
+        livro.id = id           # Vamos garantir que o id se manterá o mesmo
+        self.livros[id] = livro
+        conn.close()
         return livro
 
 ############################################
@@ -83,7 +116,6 @@ class BancoDados:
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
-        # Carregar os usuários
         cursor.execute("SELECT id, nome, email, senha, data_nasc FROM usuarios")
         for row in cursor.fetchall():
             usuario = Usuario(row[1], row[2], row[3], row[4])
@@ -103,25 +135,74 @@ class BancoDados:
         )
 
         conn.commit()
-        conn.close()
 
         self.usuarios[usuario.id] = usuario
+        conn.close()
         return usuario
 
     def buscarEmail(self, email):
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
-        cursor.execute("SELECT id, nome, email, senha, data_nasc FROM usuarios WHERE email = ?", (email,))
-        row = cursor.fetchone()
-        conn.close()
+        cursor.execute("SELECT id, nome, email, senha, data_nasc FROM usuarios WHERE email = ?",
+                       (email,))
+        row = cursor.fetchone() # Registramos a coluna com o que foi encontrado (ou retorna null :p)
 
-        if row:
+        if row: # Caso seja encontrado, registra o usuário para retorná-lo
             usuario = Usuario(row[1], row[2], row[3], row[4])
             usuario.id = row[0]
             # Retornamos usuario para validação
             return usuario
+
+        conn.close()
         return None
 
 ############################################
+        ########## LEITURAS ##########
+            ####################
 
+    def carregarLeituras(self, idUsuario):
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "SELECT id_usuario, id_livro, status, avaliacao, data_leitura, comentario FROM leituras where id_usuario = ?",
+             (idUsuario,))
+
+        leituras = [] # Abrimos um array
+        for row in cursor.fetchall():
+            leitura = Leitura(row[0], row[1], row[2], row[3], row[4], row[5])
+            leituras.append(leitura) # Registramos cada uma das leituras do loop dentro do array
+            return leituras
+
+        conn.close()
+        return None
+
+    def cadastrarLeitura(self, idUsuario, idLivro, status, avaliacao, dataLeitura, comentario):
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "INSERT INTO leituras (id_usuario, id_livro, status, avaliacao, data_leitura, comentario) VALUES (?, ?, ?, ?, ?)",
+            (idUsuario, idLivro, status, avaliacao, dataLeitura)
+        )
+        conn.commit()
+        conn.close()
+
+        nova_leitura = Leitura(idUsuario, idLivro, status, avaliacao, dataLeitura, comentario)
+        return nova_leitura
+
+    def editarLeitura(self, idUsuario, idLivro, status, avaliacao, dataLeitura, comentario):
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "UPDATE leituras SET status = ?, avaliacao = ?, data_leitura = ?, comentario = ? WHERE id_usuario = ? AND id_livro = ?",
+                (status, avaliacao, dataLeitura, comentario, idUsuario, idLivro)
+        )
+        conn.commit()
+        conn.close()
+
+        leitura = Leitura(idUsuario, idLivro, status, avaliacao, dataLeitura)
+        return leitura
+############################################
