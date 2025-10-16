@@ -50,7 +50,7 @@ def verificar_usuario(f):
     Isso é um decorator
     """
 
-    @wraps(f) # Preservando metados para não causar overwrite nas funções
+    @wraps(f) # Preservando metadados para não causar overwrite nas funções
     def decorator(*args, **kwargs):         # *args, **kwargs repassam os parâmetros (aqui é 'usuario_id')
         usuario_id = kwargs.get("usuario_id") # Recebendo o valor de usuario_id que veio da endpoint
         usuario = bd.usuarios.get(usuario_id)
