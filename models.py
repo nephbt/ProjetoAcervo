@@ -26,7 +26,7 @@ class Usuario:
         return bcrypt.checkpw(senha.encode(), self._senha_hash)
 
 
-    # Omitir senha no json
+    # Função pra omitirmos a senha no json
     def to_dict(self):
         return {
             "id": self.id,
@@ -36,9 +36,10 @@ class Usuario:
         }
 
 class Leitura:
-    def __init__(self, id_usuario, id_livro, status, avaliacao=None, data_leitura=None):
-        self.id_usuario = id_usuario
-        self.id_livro = id_livro
+    def __init__(self, idUsuario, idLivro, status, avaliacao=None, dataLeitura=None, comentario=None):
+        self.id_usuario = idUsuario
+        self.id_livro = idLivro
         self.status = status # ex: "lido", "lendo", "quero ler"
         self.avaliacao = avaliacao # nota opcional
-        self.data_leitura = data_leitura
+        self.dataLeitura = dataLeitura
+        self.comentario = comentario
