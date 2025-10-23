@@ -7,13 +7,21 @@ def criar_tabelas(db_path='projeto_acervo'):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
+    # Como não foi feito antes a adição da url então tive que alterar a tabela
+    try:
+        cursor.execute("ALTER TABLE livros ADD COLUMN imagem_url TEXT")
+    except sqlite3.OperationalError:
+        # coluna já existe
+        pass
+
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS livros (
             id TEXT PRIMARY KEY NOT NULL,
             titulo VARCHAR NOT NULL,
             autor VARCHAR NOT NULL,
             genero VARCHAR NOT NULL,
-            ano_publicacao INT NOT NULL
+            ano_publicacao INT NOT NULL,
+            imagem_url TEXT
         )
     ''')
 
@@ -73,21 +81,21 @@ class BancoDados:
 
         conn.close()
 
-    def cadastrarLivro(self, id, titulo, autor, genero, ano_publicacao):
-        livro = Livro(titulo, autor, genero, ano_publicacao)
+    def cadastrarLivro(self, id, titulo, autor, genero, ano_publicacao,  imagem_url=None):
+        livro = Livro(titulo, autor, genero, ano_publicacao, imagem_url)
 
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         cursor.execute(
-            "INSERT INTO livros (id, titulo, autor, genero, ano_publicacao) VALUES (?, ?, ?, ?, ?)",
-            (id, titulo, autor, genero, ano_publicacao)
+            "INSERT INTO livros (id, titulo, autor, genero, ano_publicacao, imagem_url) VALUES (?, ?, ?, ?, ?, ?)",
+            (id, titulo, autor, genero, ano_publicacao, imagem_url)
         )
 
         conn.commit()
-
+        conn.close()
         self.livros[livro.id] = livro
 
-        conn.close()
+
         return livro
 
     def editarLivro(self, id, titulo, autor, genero, ano_publicacao):

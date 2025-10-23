@@ -1,0 +1,6 @@
+# backend inteiro: exige aprovação de halissonfranca
+/app.py @HalissonFranca
+/database.py @HalissonFranca
+/models.py @HalissonFranca
+/templates/cadastro_livro.html @HalissonFranca
+/templates/cadastro_usuario.html @HalissonFranca
