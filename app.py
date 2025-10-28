@@ -180,7 +180,6 @@ def retornarUsuarioId(usuario_id):
 
 # GET de todos os usuarios
 @app.route("/usuarios", methods=['Get'])
-@verificar_usuario
 def retornarUsuario():
     return jsonify([usuario.to_dict() for usuario in bd.usuarios.values()]), 200
 
