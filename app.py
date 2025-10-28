@@ -94,6 +94,16 @@ def loginECadastro():
     # Retornar html da página de login/cadastro
     return "oi sou outro placeholder"
 
+# Endpoint serve para renderizar o formulário em html para pegar os dados do usuario
+@app.route("/cadastro_usuario")
+def paginaCadastroUsuario():
+    return render_template("cadastro_usuario.html")
+
+# Renderiza o formulário no html
+@app.route("/cadastro_livro")
+def paginaCadastroLivro():
+    return render_template("cadastro_livro.html")
+
 ############################################
         ########## LIVROS ##########
             ####################
@@ -145,12 +155,6 @@ def cadastrarLivro():
 
     return jsonify(novo_livro.__dict__), 201
 
-# Renderiza o formulário no html
-@app.route("/cadastro_livro")
-def paginaCadastroLivro():
-    return render_template("cadastro_livro.html")
-
-
 # PUT de livro
 @app.route("/livros/<livro_id>", methods= ['Put'])
 @verificar_livro
@@ -192,10 +196,6 @@ def cadastrarUsuario():
     )
     return jsonify(cadastro.to_dict()), 201
 
-# Endpoint serve para renderizar o formulário em html para pegar os dados do usuario
-@app.route("/cadastro_usuario")
-def paginaCadastroUsuario():
-    return render_template("cadastro_usuario.html")
 
 # POST de login com autenticação JWT
 @app.route("/usuarios/login", methods=['Post'])
@@ -223,13 +223,8 @@ def retornarUsuarioId(usuario_id):
     usuario = bd.usuarios.get(usuario_id)
     return jsonify(usuario.to_dict()), 200
 
-@app.route("/usuario", methods=['GET'])
-def listarUsuarios():
-    return jsonify([usuario.to_dict() for usuario in bd.usuarios.values()]), 200
-
 # GET de todos os usuarios
 @app.route("/usuarios", methods=['Get'])
-@verificar_usuario
 def retornarUsuario():
     return jsonify([usuario.to_dict() for usuario in bd.usuarios.values()]), 200
 

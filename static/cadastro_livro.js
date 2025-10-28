@@ -15,11 +15,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const data = await resp.json();
 
         if (resp.ok) {
-            resposta.textContent = "✅ Livro cadastrado com sucesso!";
+            resposta.textContent = "Livro cadastrado com sucesso!";
             resposta.style.color = "green";
             form.reset();
         } else {
-            resposta.textContent = "❌ Erro ao cadastrar livro: " + JSON.stringify(data);
+            resposta.textContent = "Erro ao cadastrar livro: " + JSON.stringify(data);
             resposta.style.color = "red";
         }
     });

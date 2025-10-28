@@ -95,7 +95,6 @@ class BancoDados:
         conn.close()
         self.livros[livro.id] = livro
 
-
         return livro
 
     def editarLivro(self, id, titulo, autor, genero, ano_publicacao):
@@ -108,7 +107,6 @@ class BancoDados:
         )
 
         conn.commit()
-
 
         livro = Livro(titulo, autor, genero, ano_publicacao)
         livro.id = id           # Vamos garantir que o id se manterá o mesmo

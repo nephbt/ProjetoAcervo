@@ -27,6 +27,7 @@ class Usuario:
         return bcrypt.checkpw(senha.encode(), self._senha_hash)
 
 
+
     # Função pra omitirmos a senha no json
     def to_dict(self):
         return {
