@@ -2,12 +2,13 @@ import uuid
 import bcrypt
 
 class Livro:
-    def __init__(self, titulo, autor, genero, ano_publicacao):
-        self.id = str(uuid.uuid4()) # Vamos gerar IDs aleatorios e seguros
+    def __init__(self, titulo, autor, genero, ano_publicacao, imagem_url=None): # Modificação em colocar a url
+        self.id = str(uuid.uuid4())
         self.titulo = titulo
         self.autor = autor
         self.genero = genero
         self.ano_publicacao = ano_publicacao
+        self.imagem_url = imagem_url
 
 class Usuario:
     def __init__(self, nome, email, senha, data_nasc):
@@ -24,6 +25,7 @@ class Usuario:
 
     def verificar_senha(self, senha): # Validação para senha criptografada :)
         return bcrypt.checkpw(senha.encode(), self._senha_hash)
+
 
 
     # Função pra omitirmos a senha no json
