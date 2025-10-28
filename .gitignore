@@ -1,0 +1,9 @@
+# Arquivos Python compilados
+__pycache__/
+*.pyc
+
+# Virtualenv
+.venv/
+
+# Executáveis ou builds
+projeto_acervo
