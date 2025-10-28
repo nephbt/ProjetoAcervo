@@ -5,5 +5,12 @@ __pycache__/
 # Virtualenv
 .venv/
 
-# Executáveis ou builds
+# Executáveis e builds locais
 projeto_acervo
+*.exe
+*.bin
+*.log
+
+# IDEs e metadados
+.vscode/
+.idea/
