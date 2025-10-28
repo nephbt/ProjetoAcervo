@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro de Livro</title>
+</head>
+
+<body>
+    <h1>Cadastro de Livros</h1>
+
+    <form id="formLivro">
+        <label>Título:</label><br>
+        <input type="text" name="titulo" required><br><br>
+
+        <label>Autor:</label><br>
+        <input type="text" name="autor" required><br><br>
+
+        <label>Gênero:</label><br>
+        <input type="text" name="genero" required><br><br>
+
+        <label>Ano de Publicação:</label><br>
+        <input type="number" name="ano_publicacao" required><br><br>
+
+        <label>URL da Imagem:</label><br>
+        <input type="text" name="imagem"><br><br>
+
+        <button type="submit">Cadastrar Livro</button>
+    </form>
+
+    <p id="resposta"></p>
+
+    <script src="{{ url_for('static', filename='js/cadastro_livro.js') }}"></script>
+</body>
+
+</html>

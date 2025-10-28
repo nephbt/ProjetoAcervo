@@ -1,0 +1,16 @@
+# Arquivos Python compilados
+__pycache__/
+*.pyc
+
+# Virtualenv
+.venv/
+
+# Executáveis e builds locais
+projeto_acervo
+*.exe
+*.bin
+*.log
+
+# IDEs e metadados
+.vscode/
+.idea/

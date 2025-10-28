@@ -4,6 +4,17 @@ import uuid
 import jwt
 import datetime
 from database import BancoDados
+from flask import render_template 
+
+# ------------------------------------------------------------
+# PARA ACESSAR A PAGINA DOS CADASTROS VC PRECISA ACESSAR PELOS ENDPOINTS.
+
+# CADASTROS USUARIOS: http://127.0.0.1:5000/cadastro_usuario
+# ACESSAR AS INFORMAÇÕES DO BANCO DE DADOS DE USUARIOS JSON:http://127.0.0.1:5000/usuario
+
+# CADASTROS LIVROS: http://127.0.0.1:5000/cadastro_livro
+# ACESSAR AS INFORMAÇÕES DO BANCO DE DADOS DE LIVROS JSON: http://127.0.0.1:5000/livros
+#-------------------------------------------------------------
 
 app = Flask(__name__)
 bd = BancoDados()
@@ -83,6 +94,16 @@ def loginECadastro():
     # Retornar html da página de login/cadastro
     return "oi sou outro placeholder"
 
+# Endpoint serve para renderizar o formulário em html para pegar os dados do usuario
+@app.route("/cadastro_usuario")
+def paginaCadastroUsuario():
+    return render_template("cadastro_usuario.html")
+
+# Renderiza o formulário no html
+@app.route("/cadastro_livro")
+def paginaCadastroLivro():
+    return render_template("cadastro_livro.html")
+
 ############################################
         ########## LIVROS ##########
             ####################
@@ -90,7 +111,10 @@ def loginECadastro():
 # POST de livros
 @app.route("/livros", methods=['Post'])
 def uparLivro():
-    data = request.get_json()
+    if request.is_json: # Verifica se o conteúdo é JSON ou form data, onde sera mandado o json para p banco e o form para o html
+        data = request.get_json()
+    else:
+        data = request.form
 
     novo_livro = bd.cadastrarLivro(
         str(uuid.uuid4()),
@@ -100,6 +124,7 @@ def uparLivro():
         data["ano_publicacao"]
     )
     return jsonify(novo_livro.__dict__), 201
+
 
 # GET de livro com ID
 @app.route("/livros/<livro_id>", methods=['Get'])
@@ -112,6 +137,23 @@ def retornarLivroId(livro_id):
 @app.route("/livros", methods=['Get'])
 def retornarLivros():
     return jsonify([livro.__dict__ for livro in bd.livros.values()]), 200
+
+# Cadastro de livros
+@app.route("/livros/cadastro", methods=['POST'])
+def cadastrarLivro():
+    data = request.form
+    imagem_url = data.get("imagem")  # aqui pegamos a URL
+
+    novo_livro = bd.cadastrarLivro(
+        str(uuid.uuid4()),
+        data["titulo"],
+        data["autor"],
+        data["genero"],
+        data["ano_publicacao"],
+        imagem_url
+    )
+
+    return jsonify(novo_livro.__dict__), 201
 
 # PUT de livro
 @app.route("/livros/<livro_id>", methods= ['Put'])
@@ -137,11 +179,13 @@ def editarLivro(livro_id):
         ########## USUARIOS ##########
             ####################
 
-# POST de cadastro de usuario
+# POST de cadastro de usuario e processa os dados
 @app.route("/usuarios/cadastro", methods=['Post'])
 def cadastrarUsuario():
-    data = request.get_json()
-    # data = request.form # EVENTUALMENTE, SUBSTITUIR O DE CIMA POR ESSE
+    if request.is_json: # Verifica se o conteúdo é JSON ou form data, onde sera mandado o json para p banco e o form para o html
+        data = request.get_json()
+    else:
+        data = request.form
 
     cadastro = bd.cadastrarUsuario(
         str(uuid.uuid4()),
@@ -151,6 +195,7 @@ def cadastrarUsuario():
         data["data_nasc"]
     )
     return jsonify(cadastro.to_dict()), 201
+
 
 # POST de login com autenticação JWT
 @app.route("/usuarios/login", methods=['Post'])
