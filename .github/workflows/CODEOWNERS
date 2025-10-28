@@ -1,0 +1,6 @@
+# backend inteiro: exige aprovação de Bruno
+/app.py @nephbt
+/database.py @nephbt
+/models.py @nephbt
+/templates/cadastro_livro.html @nephbt
+/templates/cadastro_usuario.html @nephbt
