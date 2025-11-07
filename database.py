@@ -52,6 +52,22 @@ def criar_tabelas(db_path='projeto_acervo'):
     conn.commit()
     conn.close()
 
+def criar_backup(db_path='projeto_acervo', backup_path='backup.sql'):
+    conn = sqlite3.connect(db_path)
+    with open(backup_path, "w", encoding="utf-8") as f:
+        for line in conn.iterdump():
+            f.write("%s\n" % line)
+    conn.close()
+    print(f"Backup criado com sucesso em {backup_path}")
+
+def restaurar_backup(db_path='projeto_acervo', backup_path='backup.sql'):
+    conn = sqlite3.connect(db_path)
+    with open(backup_path, "r", encoding="utf-8") as f:
+        conn.executescript(f.read())
+    conn.close()
+    print(f"Banco restaurado a partir de {backup_path}")
+
+
 class BancoDados:
     def __init__(self, db_path='projeto_acervo'):
         self.db_path = db_path

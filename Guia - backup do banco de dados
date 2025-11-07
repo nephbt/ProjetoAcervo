@@ -1,0 +1,15 @@
+TRAZER BACKUP
+    Sempre que realizar um git pull, é interessante trazer o backup para sua máquina.
+    No terminal, execute:
+        python -c "from database import restaurar_backup; restaurar_backup()"
+
+
+FAZER BACKUP
+    Sempre que novos dados forem adicionados, ele deve ser receber backup.
+    No terminal, antes de subir as mudanças, execute:
+       python -c "from database import criar_backup; criar_backup()"
+    Adicione e commite.
+
+
+IMPORTANTE: O arquivo 'projeto_acervo' não deve ser apagado do projeto e nem removido do
+gitignore. Seu versionamento para o git gerará conflitos.
