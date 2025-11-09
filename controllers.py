@@ -1,3 +1,4 @@
+'''
 from flask import Blueprint, jsonify, request
 from database import BancoDados
 from functools import wraps
@@ -78,6 +79,7 @@ def verificar_livro(f):
             ####################
 # POST de livros
 @livrosRoute.route("/", methods=['post'])
+
 def uparLivro():
     if request.is_json: # Verifica se o conteúdo é JSON ou form data, onde sera mandado o json para p banco e o form para o html
         data = request.get_json()
@@ -155,21 +157,29 @@ def cadastrarUsuario():
     else:
         data = request.form
 
-    cadastro = bd.cadastrarUsuario(
+    novo_usuario = bd.cadastrarUsuario(
         str(uuid.uuid4()),
         data["nome"],
         data["email"],
         data["senha"],
         data["data_nasc"]
     )
-    return jsonify(cadastro.to_dict()), 201
+
+    if novo_usuario is None:
+        # Já existe um usuário com esse e-mail
+        return jsonify({"erro": "E-mail já cadastrado!"}), 400
+
+    return jsonify(novo_usuario.to_dict()), 201
 
 
 # POST de login com autenticação JWT
-@usuariosRoute.route("/login", methods=['post'])
+@usuariosRoute.route("/login", methods=['POST'])
 def login():
-    data = request.get_json()
-    # data = request.form # EVENTUALMENTE, SUBSTITUIR O DE CIMA POR ESSE
+    if request.is_json:
+        data = request.get_json() #Aceita tanto json quando form data
+    else:
+        data = request.form
+
     email = data.get("email")
     senha = data.get("senha")
 
@@ -177,10 +187,14 @@ def login():
     if usuario and usuario.verificar_senha(senha):
         token = gerar_token(usuario.id)
 
-        # session["token"] = token # Para eventualmente, quando houver formulario html de login
-
-        return jsonify({"token": token, "usuario":{"id": usuario["id"], "nome": usuario["nome"], "email": usuario["email"]}})
-        # return redirect(url_for("home_usuario")) # EVENTUALMENTE, SUBSTITUIR O DE CIMA POR ESSE
+        return jsonify({
+            "token": token,
+            "usuario": {
+            "id": usuario.id,
+            "nome": usuario.nome,
+            "email": usuario.email
+            }
+        }), 200
 
     return jsonify({"erro": "Email ou senha incorretos"}), 401
 
@@ -233,7 +247,9 @@ def registrarLeitura(usuario_id, livro_id):
 # @requerir_token
 # def carregarLeiturasUsuario():
 @leiturasRoute.route("/<usuario_id>", methods=['get'])
-def carregarLeiturasUsuario(usuario_id):
+@requerir_token
+@verificar_usuario
+def carregarLeiturasUsuario(id_usuario, usuario_id):
     leituras = bd.carregarLeituras(usuario_id)
 
     if not leituras:
@@ -270,4 +286,4 @@ def editarLeitura(usuario_id, livro_id):
     return jsonify(leituraEditada.__dict__), 201
     # return redirect(url_for("registro_leituras")) # EVENTUALMENTE, SUBSTITUIR O DE CIMA POR ESSE
 
-############################################
+############################################'''

@@ -1,42 +1,53 @@
-from flask import Flask, request, jsonify, redirect, url_for, session, Blueprint
-from flask import render_template
-from controllers import usuariosRoute, livrosRoute, leiturasRoute
+from flask import Flask, render_template
+from controllers.livros_controller import livrosRoute
+from controllers.usuarios_controller import usuariosRoute
+from controllers.leituras_controller import leiturasRoute
+from controllers.paginas_controller import pagesRoute
 
 # ------------------------------------------------------------
-# PARA ACESSAR A PAGINA DOS CADASTROS VC PRECISA ACESSAR PELOS ENDPOINTS.
-
-# CADASTROS USUARIOS: http://127.0.0.1:5000/cadastro_usuario
-# ACESSAR AS INFORMAÇÕES DO BANCO DE DADOS DE USUARIOS JSON:http://127.0.0.1:5000/usuarios
-
-# CADASTROS LIVROS: http://127.0.0.1:5000/cadastro_livro
-# ACESSAR AS INFORMAÇÕES DO BANCO DE DADOS DE LIVROS JSON: http://127.0.0.1:5000/livros
-#-------------------------------------------------------------
+#  ROTAS DE TESTE / FORMULÁRIOS HTML
+# ------------------------------------------------------------
+# Para acessar as páginas no navegador:
+#  - Cadastro de usuários: http://127.0.0.1:5000/cadastro_usuario
+#  - API de usuários (JSON): http://127.0.0.1:5000/usuarios
+#  - Cadastro de livros: http://127.0.0.1:5000/cadastro_livro
+#  - API de livros (JSON): http://127.0.0.1:5000/livros
+# ------------------------------------------------------------
 
 app = Flask(__name__)
+app.secret_key = "chave_muito_secreta"
+
+# Registro dos blueprints
 app.register_blueprint(livrosRoute)
 app.register_blueprint(usuariosRoute)
 app.register_blueprint(leiturasRoute)
+app.register_blueprint(pagesRoute)
+
+# ------------------------------------------------------------
+# Rotas principais de páginas HTML
 
 @app.route("/")
 def homepage():
-    # Retornar index.html aqui
-    return "oi sou um placeholder"
+    # Aqui futuramente você pode retornar seu "index.html"
+    return "Olá! A API do Acervo está rodando"
 
-@app.route("/entrar")
-def loginECadastro():
-    # Retornar html da página de login/cadastro
-    return "oi sou outro placeholder"
+@app.route("/login_usuario")
+def login_usuario():
+    # Página de login (formulário HTML)
+    return render_template("login.html")
 
-# Endpoint serve para renderizar o formulário em html para pegar os dados do usuario
 @app.route("/cadastro_usuario")
-def paginaCadastroUsuario():
+def cadastro_usuario():
+    # Página de cadastro de usuários
     return render_template("cadastro_usuario.html")
 
-# Renderiza o formulário no html
 @app.route("/cadastro_livro")
-def paginaCadastroLivro():
+def cadastro_livro():
+    # Página de cadastro de livros
     return render_template("cadastro_livro.html")
 
-
-if __name__ == '__main__':
+# ------------------------------------------------------------
+# Execução do servidor Flask
+# ------------------------------------------------------------
+if __name__ == "__main__":
     app.run(debug=True)

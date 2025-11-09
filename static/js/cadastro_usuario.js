@@ -13,12 +13,14 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         if (resp.ok) {
-            msg.textContent = "Usuário cadastrado com sucesso!";
+            msg.textContent = "✅ Usuário cadastrado com sucesso!";
             msg.style.color = "green";
-            form.reset(); // limpa o formulário
+            form.reset();
         } else {
-            msg.textContent = "Erro ao cadastrar usuário.";
+            const erro = await resp.json();
+            msg.textContent = "❌ " + (erro.erro || "Erro ao cadastrar usuário.");
             msg.style.color = "red";
         }
+
     });
 });

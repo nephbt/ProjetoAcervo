@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minhas Leituras</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+
+</head>
+
+<body>
+    <h1>Minhas Leituras</h1>
+
+    <!-- Campo de pesquisa -->
+    <input type="text" id="pesquisaLivro" placeholder="Pesquisar livros por título ou autor">
+
+    <!-- Grid de livros -->
+    <div class="livros-grid" id="livrosGrid"></div>
+
+    <!-- Modal para marcar leitura -->
+    <div class="modal" id="modalLeitura">
+        <div class="modal-content">
+            <span class="fechar" id="fecharModal">&times;</span>
+            <h2>Marcar como lido</h2>
+            <form id="formLeitura">
+                <input type="hidden" id="livroId">
+
+                <label>Status:</label>
+                <select id="status" required>
+                    <option value="lido">Lido</option>
+                    <option value="lendo">Lendo</option>
+                    <option value="quer_ler">Quer Ler</option>
+                </select><br><br>
+
+                <label>Avaliação:</label>
+                <div class="estrelas" id="estrelas">
+                    <span data-value="1">&#9733;</span>
+                    <span data-value="2">&#9733;</span>
+                    <span data-value="3">&#9733;</span>
+                    <span data-value="4">&#9733;</span>
+                    <span data-value="5">&#9733;</span>
+                </div><br>
+
+                <label>Comentário (opcional):</label><br>
+                <textarea id="comentario" rows="3"></textarea><br><br>
+
+                <label>Data da leitura:</label>
+                <input type="date" id="data_leitura" required><br><br>
+
+                <button type="submit">Salvar</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/static/js/leituras.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            iniciarMinhasLeituras();
+
+            // Pesquisa de livros
+            const inputPesquisa = document.getElementById("pesquisaLivro");
+            inputPesquisa.addEventListener("input", () => {
+                const query = inputPesquisa.value.toLowerCase();
+                document.querySelectorAll(".livro-card").forEach(card => {
+                    const titulo = card.querySelector("h3").textContent.toLowerCase();
+                    const autor = card.querySelector("p").textContent.toLowerCase();
+                    card.style.display = titulo.includes(query) || autor.includes(query) ? "block" : "none";
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
