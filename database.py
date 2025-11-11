@@ -72,7 +72,7 @@ def restaurar_backup(db_path='projeto_acervo', backup_path='backup.sql'):
 class BancoDados:
     def __init__(self, db_path='projeto_acervo'):
         self.db_path = db_path
-        self.conn = sqlite3.connect(self.db_path, check_same_thread=False)  # 👈 ADICIONE ESTA LINHA
+        self.conn = sqlite3.connect(self.db_path, check_same_thread=False)
         criar_tabelas(self.db_path)
         self.livros = {}
         self.usuarios = {}
