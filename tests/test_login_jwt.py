@@ -1,3 +1,4 @@
+from types import SimpleNamespace
 import pytest
 from unittest.mock import patch
 from app import app
@@ -14,19 +15,16 @@ def client():
 
 # ---------- TESTE DE LOGIN COM MOCK ----------
 def test_login_usuario_mockado(client):
-    usuario_falso = {
-        "id": "123",
-        "nome": "João Teste",
-        "email": "joao@teste.com",
-        "senha": "12345678",  # senha original
-        "data_nasc": "2000-01-01"
-    }
+    usuario_falso = SimpleNamespace(
+        id="123",
+        nome="João Teste",
+        email="joao@teste.com",
+        senha="12345678",
+        data_nasc="2000-01-01",
+        verificar_senha=lambda senha: senha == "12345678"  # mock do método
+    )
 
-    # Simula a função bd.buscarEmail() retornando o usuário falso
-    with patch("controllers.usuariosController.bd.buscarEmail", return_value=usuario_falso), \
-         patch("controllers.usuariosController.bd.verificar_senha", return_value=True):
-
-        # Faz o login com os mesmos dados do usuário falso
+    with patch("controllers.usuarios_controller.bd.buscarEmail", return_value=usuario_falso):
         response = client.post("/usuarios/login", json={
             "email": "joao@teste.com",
             "senha": "12345678"

@@ -72,10 +72,12 @@ def restaurar_backup(db_path='projeto_acervo', backup_path='backup.sql'):
 class BancoDados:
     def __init__(self, db_path='projeto_acervo'):
         self.db_path = db_path
+        self.conn = sqlite3.connect(self.db_path, check_same_thread=False)  # 👈 ADICIONE ESTA LINHA
         criar_tabelas(self.db_path)
         self.livros = {}
         self.usuarios = {}
         self.carregarDados()
+
 
     def carregarDados(self):
         self.carregarLivros()
@@ -98,38 +100,42 @@ class BancoDados:
         conn.close()
 
 
-    def cadastrarLivro(self, id, titulo, autor, genero, ano_publicacao,  imagem_url=None):
+    def cadastrarLivro(self, id, titulo, autor, genero, ano_publicacao, imagem_url):
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            INSERT INTO livros (id, titulo, autor, genero, ano_publicacao, imagem_url)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (id, titulo, autor, genero, ano_publicacao, imagem_url))
+
+        conn.commit()
+        conn.close()
+
         livro = Livro(titulo, autor, genero, ano_publicacao, imagem_url)
-
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO livros (id, titulo, autor, genero, ano_publicacao, imagem_url) VALUES (?, ?, ?, ?, ?, ?)",
-            (id, titulo, autor, genero, ano_publicacao, imagem_url)
-        )
-
-        conn.commit()
-        conn.close()
-        self.livros[livro.id] = livro
-
+        livro.id = id
+        self.livros[id] = livro  # Atualiza o cache em memória
         return livro
 
-    def editarLivro(self, id, titulo, autor, genero, ano_publicacao):
+    def editarLivro(self, id, titulo, autor, genero, ano_publicacao, imagem_url=None):
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
         cursor.execute(
-            "UPDATE livros SET titulo = ?, autor = ?, genero = ?, ano_publicacao = ? WHERE id = ?",
-            (titulo, autor, genero, ano_publicacao, id)
+            "UPDATE livros SET titulo = ?, autor = ?, genero = ?, ano_publicacao = ?, imagem_url = ? WHERE id = ?",
+            (titulo, autor, genero, ano_publicacao, imagem_url, id)
         )
 
         conn.commit()
 
-        livro = Livro(titulo, autor, genero, ano_publicacao)
-        livro.id = id           # Vamos garantir que o id se manterá o mesmo
+        # Atualiza no cache (dicionário em memória)
+        livro = Livro(titulo, autor, genero, ano_publicacao, imagem_url=imagem_url)
+        livro.id = id
         self.livros[id] = livro
+
         conn.close()
         return livro
+
     
     def buscarLivroPorId(self, livro_id):
         conn = sqlite3.connect(self.db_path)
@@ -139,14 +145,10 @@ class BancoDados:
         conn.close()
 
         if row:
-            return Livro(
-                row[1],  # titulo
-                row[2],  # autor
-                row[3],  # genero
-                row[4],  # ano_publicacao
-                row[5]   # imagem_url
-            )
-        return None
+            livro = Livro(row[1], row[2], row[3], row[4], row[5])
+            livro.id = row[0]
+            return livro
+
 
 ############################################
         ########## USUARIOS ##########

@@ -26,8 +26,6 @@ class Usuario:
     def verificar_senha(self, senha): # Validação para senha criptografada :)
         return bcrypt.checkpw(senha.encode(), self._senha_hash)
 
-
-
     # Função pra omitirmos a senha no json
     def to_dict(self):
         return {

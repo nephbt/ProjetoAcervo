@@ -49,3 +49,9 @@ def retornarUsuarioId(usuario_id):
 def retornarUsuario():
     return jsonify([usuario.to_dict() for usuario in bd.usuarios.values()]), 200
 
+@usuariosRoute.route("/perfil", methods=["GET"])
+@requerir_token
+def perfil(id_usuario):
+    return jsonify({"mensagem": f"Bem-vindo usuário {id_usuario}!"}), 200
+
+

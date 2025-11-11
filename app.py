@@ -29,7 +29,7 @@ app.register_blueprint(pagesRoute)
 @app.route("/")
 def homepage():
     # Aqui futuramente você pode retornar seu "index.html"
-    return "Olá! A API do Acervo está rodando"
+    return render_template("index.html")
 
 @app.route("/login_usuario")
 def login_usuario():

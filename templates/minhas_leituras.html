@@ -5,12 +5,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minhas Leituras</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
 
 
 </head>
 
 <body>
+    <!-- Cabeçalho -->
+    <header>
+        <div id="logo">
+            <img src="static\images\default.png" alt="Logo da Biblioteca">
+        </div>
+        <nav>
+            <a href="crudes_livros">CRUDE</a>
+            <a href="perfil">Perfil</a>
+        </nav>
+    </header>
+
     <h1>Minhas Leituras</h1>
 
     <!-- Campo de pesquisa -->
@@ -54,23 +65,55 @@
         </div>
     </div>
 
-    <script src="/static/js/leituras.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            iniciarMinhasLeituras();
+    <!-- Rodapé -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section sobre">
+                <h3>📚 Biblioteca Sugestões</h3>
+                <p>Uma plataforma para registrar e descobrir novas leituras. Explore, avalie os seus livros favoritos!
+                </p>
+            </div>
 
-            // Pesquisa de livros
-            const inputPesquisa = document.getElementById("pesquisaLivro");
-            inputPesquisa.addEventListener("input", () => {
-                const query = inputPesquisa.value.toLowerCase();
-                document.querySelectorAll(".livro-card").forEach(card => {
-                    const titulo = card.querySelector("h3").textContent.toLowerCase();
-                    const autor = card.querySelector("p").textContent.toLowerCase();
-                    card.style.display = titulo.includes(query) || autor.includes(query) ? "block" : "none";
+            <div class="footer-section links">
+                <h4>Links Rápidos</h4>
+                <ul>
+                    <li><a href="/">Início</a></li>
+                    <li><a href="/livros">Livros</a></li>
+                    <li><a href="/login_usuario">Login</a></li>
+                    <li><a href="/cadastro_usuario">Cadastro</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section contato">
+                <h4>Contato</h4>
+                <p>📧 projetoacervo@gmail.com</p>
+                <p>📞 (62) 98567-9987</p>
+                <div class="social">
+                    <a href="#"><img src="/static/images/facebook.png" alt="Facebook"></a>
+                    <a href="#"><img src="/static/images/instagram.png" alt="Instagram"></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+
+            <script src="/static/js/leituras.js"></script>
+            <script>
+                document.addEventListener("DOMContentLoaded", () => {
+                    iniciarMinhasLeituras();
+
+                    // Pesquisa de livros
+                    const inputPesquisa = document.getElementById("pesquisaLivro");
+                    inputPesquisa.addEventListener("input", () => {
+                        const query = inputPesquisa.value.toLowerCase();
+                        document.querySelectorAll(".livro-card").forEach(card => {
+                            const titulo = card.querySelector("h3").textContent.toLowerCase();
+                            const autor = card.querySelector("p").textContent.toLowerCase();
+                            card.style.display = titulo.includes(query) || autor.includes(query) ? "block" : "none";
+                        });
+                    });
                 });
-            });
-        });
-    </script>
+            </script>
 </body>
 
 </html>

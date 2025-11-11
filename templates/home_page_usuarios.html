@@ -5,178 +5,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Biblioteca Sugestões</title>
-    <style>
-        /* Reset básico */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    <link rel="stylesheet" href="../static/css/home.css">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/default.png') }}">
+    <!-- logo na aba /\-->
 
-        /* Corpo geral */
-        body {
-            font-family: 'Georgia', serif;
-            /* Fonte elegante para livros */
-            line-height: 1.6;
-            color: #333;
-            background: linear-gradient(to bottom, #e8f4f8, #ffffff);
-            /* Gradiente sutil */
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Cabeçalho */
-        header {
-            background: linear-gradient(90deg, #4a90e2, #357abd);
-            /* Azul biblioteca */
-            color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            width: 100%;
-            /* Garante que cubra toda a largura */
-        }
-
-        #logo img {
-            height: 60px;
-            border-radius: 5px;
-        }
-
-        nav {
-            display: flex;
-            gap: 20px;
-        }
-
-        nav a {
-            color: white;
-            text-decoration: none;
-            font-weight: bold;
-            padding: 10px 15px;
-            border-radius: 5px;
-            transition: background 0.3s ease;
-        }
-
-        nav a:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        /* Corpo principal */
-        main {
-            flex: 1;
-            padding: 40px 20px;
-            text-align: center;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 20px;
-            color: #4a90e2;
-        }
-
-        p {
-            font-size: 1.2em;
-            margin-bottom: 30px;
-        }
-
-        #sugestoes {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
-        }
-
-        #sugestoes h2 {
-            color: #357abd;
-            margin-bottom: 15px;
-        }
-
-        #lista-sugestoes {
-            display: none;
-            /* Inicialmente oculto */
-            list-style: none;
-            padding: 0;
-        }
-
-        #lista-sugestoes li {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-        }
-
-        button {
-            background: #4a90e2;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background 0.3s ease;
-        }
-
-        button:hover {
-            background: #357abd;
-        }
-
-        /* Rodapé */
-        footer {
-            background: #333;
-            color: white;
-            text-align: center;
-            padding: 15px;
-            margin-top: auto;
-            /* Empurra o rodapé para o final */
-            width: 100%;
-            /* Garante que cubra toda a largura */
-        }
-
-        /* Responsividade */
-        @media (max-width: 768px) {
-            header {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            nav {
-                margin-top: 10px;
-            }
-
-            h1 {
-                font-size: 2em;
-            }
-        }
-
-        /* Animação de fade-in */
-        .fade-in {
-            opacity: 0;
-            animation: fadeIn 1s ease-in forwards;
-        }
-
-        @keyframes fadeIn {
-            to {
-                opacity: 1;
-            }
-        }
-    </style>
 </head>
 
 <body>
     <!-- Cabeçalho -->
     <header>
         <div id="logo">
-            <img src="logo.png" alt="Logo da Biblioteca"> <!-- Substitua por seu logo -->
+            <img src="static\images\default.png" alt="Logo da Biblioteca"> <!-- Substitua por seu logo -->
         </div>
         <nav>
-            <a href="minhas_leituras">Registro de Livros</a>
-            <a href="pages/perfil">Perfil</a>
+            <a href="minhas_leituras">Registo Leitura</a>
+            <a href="crudes_livros">CRUDE</a>
+            <a href="perfil">Perfil</a>
+
         </nav>
     </header>
 
@@ -199,30 +44,55 @@
 
     <!-- Rodapé -->
     <footer>
-        <p>&copy; 2023 Biblioteca Sugestões. Todos os direitos reservados.</p>
-    </footer>
+        <div class="footer-container">
+            <div class="footer-section sobre">
+                <h3>📚 Biblioteca Sugestões</h3>
+                <p>Uma plataforma para registrar e descobrir novas leituras. Explore, avalie os seus livros favoritos!
+                </p>
+            </div>
 
-    <!-- JavaScript -->
-    <script>
-        // Animação de fade-in na página
-        document.addEventListener('DOMContentLoaded', function () {
-            document.body.classList.add('fade-in');
-        });
+            <div class="footer-section links">
+                <h4>Links Rápidos</h4>
+                <ul>
+                    <li><a href="/home_page_usuarios">Início</a></li>
+                    <li><a href="/livros">Livros</a></li>
+                </ul>
+            </div>
 
-        // Toggle para mostrar/ocultar sugestões
-        const toggleButton = document.getElementById('toggle-sugestoes');
-        const listaSugestoes = document.getElementById('lista-sugestoes');
+            <div class="footer-section contato">
+                <h4>Contato</h4>
+                <p>📧 projetoacervo@gmail.com</p>
+                <p>📞 (62) 98567-9987</p>
+                <div class="social">
+                    <a href="#"><img src="/static/images/facebook.png" alt="Facebook"></a>
+                    <a href="#"><img src="/static/images/instagram.png" alt="Instagram"></a>
+                </div>
+            </div>
+        </div>
 
-        toggleButton.addEventListener('click', function () {
-            if (listaSugestoes.style.display === 'none' || listaSugestoes.style.display === '') {
-                listaSugestoes.style.display = 'block';
-                toggleButton.textContent = 'Ocultar Sugestões';
-            } else {
-                listaSugestoes.style.display = 'none';
-                toggleButton.textContent = 'Mostrar Sugestões';
-            }
-        });
-    </script>
+        <div class="footer-bottom">
+
+            <!-- JavaScript -->
+            <script>
+                // Animação de fade-in na página
+                document.addEventListener('DOMContentLoaded', function () {
+                    document.body.classList.add('fade-in');
+                });
+
+                // Toggle para mostrar/ocultar sugestões
+                const toggleButton = document.getElementById('toggle-sugestoes');
+                const listaSugestoes = document.getElementById('lista-sugestoes');
+
+                toggleButton.addEventListener('click', function () {
+                    if (listaSugestoes.style.display === 'none' || listaSugestoes.style.display === '') {
+                        listaSugestoes.style.display = 'block';
+                        toggleButton.textContent = 'Ocultar Sugestões';
+                    } else {
+                        listaSugestoes.style.display = 'none';
+                        toggleButton.textContent = 'Mostrar Sugestões';
+                    }
+                });
+            </script>
 </body>
 
 </html>

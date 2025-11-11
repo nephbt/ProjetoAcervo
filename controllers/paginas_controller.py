@@ -34,7 +34,7 @@ def home_page():
 
 
 
-@pagesRoute.route("/minhas_leituras")
+@pagesRoute.route("/minhas_leituras") #somente leituras dos livros e pesquisa dos livros
 def listar_livros():
     # Você pode pegar o usuario logado via session
     usuario_id = session.get("usuario_id")
@@ -50,3 +50,10 @@ def pesquisar_livros():
         if query in livro.titulo.lower() or query in livro.autor.lower() or query in livro.genero.lower()
     ]
     return jsonify(resultado)
+
+@pagesRoute.route("/crudes_livros")  # crud de livros
+def pagina_listar_livros():
+    # Você pode pegar o usuario logado via session
+    usuario_id = session.get("usuario_id")
+    livros = list(bd.livros.values())  # pega todos os livros
+    return render_template("gerenciar_livros.html", livros=livros, usuario_id=usuario_id)

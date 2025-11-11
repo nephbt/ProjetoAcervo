@@ -1,5 +1,3 @@
-
-
 async function iniciarMinhasLeituras() {
     const livrosGrid = document.getElementById("livrosGrid");
     const modal = document.getElementById("modalLeitura");
@@ -74,7 +72,8 @@ async function iniciarMinhasLeituras() {
             status: document.getElementById("status").value,
             avaliacao: avaliacao,
             comentario: document.getElementById("comentario").value || null,
-            data_leitura: new Date().toISOString().split('T')[0] // envia a data atual
+            data_leitura: document.getElementById("data_leitura").value
+
         };
 
         const usuario_id = JSON.parse(atob(token.split(".")[1])).id;

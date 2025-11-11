@@ -120,14 +120,183 @@ button:hover {
 
 /* Rodapé */
 footer {
-    background: #333;
-    color: white;
-    text-align: center;
-    padding: 15px;
+    background: #222;
+    color: #f5f5f5;
+    padding: 40px 0 10px;
+    font-family: Arial, sans-serif;
     margin-top: auto;
-    /* Empurra o rodapé para o final */
     width: 100%;
-    /* Garante que cubra toda a largura */
+}
+
+.footer-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: flex-start;
+    gap: 30px;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.footer-section {
+    flex: 1;
+    min-width: 220px;
+}
+
+.footer-section h3,
+.footer-section h4 {
+    color: #ffcc00;
+    margin-bottom: 10px;
+}
+
+.footer-section p {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.footer-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-section ul li {
+    margin-bottom: 6px;
+}
+
+.footer-section ul li a {
+    color: #f5f5f5;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer-section ul li a:hover {
+    color: #ffcc00;
+}
+
+.social a {
+    display: inline-block;
+    margin-right: 10px;
+    transition: transform 0.3s ease;
+}
+
+.social a:hover {
+    transform: scale(1.2);
+}
+
+.social img {
+    width: 24px;
+    height: 24px;
+    filter: brightness(0) invert(1);
+}
+
+.footer-bottom {
+    border-top: 1px solid #444;
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 10px;
+    font-size: 13px;
+    color: #aaa;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 400px;
+    position: relative;
+}
+
+.fechar {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+/* Estrelas */
+.estrelas span {
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.estrelas span.checked {
+    color: gold;
+}
+
+#pesquisaLivro {
+    display: block;
+    margin: 0 auto 20px auto;
+    padding: 8px;
+    width: 80%;
+    max-width: 400px;
+    font-size: 16px;
+}
+
+.livros-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+}
+
+.livro-card {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    background-color: #fff;
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+
+.livro-card:hover {
+    transform: scale(1.03);
+}
+
+.livro-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.livro-card h3 {
+    font-size: 18px;
+    margin: 5px 0;
+}
+
+.livro-card p {
+    font-size: 14px;
+    color: #555;
+    margin: 5px 0 10px 0;
+}
+
+.livro-card button {
+    padding: 6px 12px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.livro-card button:hover {
+    background-color: #45a049;
 }
 
 /* Responsividade */

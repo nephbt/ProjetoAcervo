@@ -6,18 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Biblioteca Sugestões</title>
     <link rel="stylesheet" href="../static/css/home.css">
-
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/default.png') }}">
 </head>
 
 <body>
     <!-- Cabeçalho -->
     <header>
         <div id="logo">
-            <img src="logo.png" alt="Logo da Biblioteca"> <!-- Substitua por seu logo -->
+            <img src="static\images\default.png" alt="Logo da Biblioteca"> <!-- Substitua por seu logo -->
         </div>
         <nav>
-            <a href="/">Início</a>
-            <a href="/perfil">Perfil</a>
             <a href="/login_usuario">Login</a>
             <a href="/cadastro_usuario">Cadastro</a>
         </nav>
@@ -45,7 +43,37 @@
 
     <!-- Rodapé -->
     <footer>
-        <p>&copy; 2023 Biblioteca Sugestões. Todos os direitos reservados.</p>
+        <div class="footer-container">
+            <div class="footer-section sobre">
+                <h3>📚 Biblioteca Sugestões</h3>
+                <p>Uma plataforma para registrar e descobrir novas leituras. Explore, avalie os seus livros favoritos!
+                </p>
+            </div>
+
+            <div class="footer-section links">
+                <h4>Links Rápidos</h4>
+                <ul>
+                    <li><a href="/">Início</a></li>
+                    <li><a href="/livros">Livros</a></li>
+                    <li><a href="/login_usuario">Login</a></li>
+                    <li><a href="/cadastro_usuario">Cadastro</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section contato">
+                <h4>Contato</h4>
+                <p>📧 projetoacervo@gmail.com</p>
+                <p>📞 (62) 98567-9987</p>
+                <div class="social">
+                    <a href="#"><img src="/static/images/facebook.png" alt="Facebook"></a>
+                    <a href="#"><img src="/static/images/instagram.png" alt="Instagram"></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2025 Biblioteca Sugestões — Todos os direitos reservados.</p>
+        </div>
     </footer>
 
     <!-- JavaScript -->
