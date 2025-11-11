@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil de Usuario</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+
+<body>
+    <header>
+        <h1>Perfil de {{ usuario.nome }}</h1>
+        <p><strong>Email:</strong> {{ usuario.email }}</p>
+
+    </header>
+    <main>
+        <section class="info-usuario">
+            <h2>Información Personal</h2>
+            <p><strong>Nombre:</strong> {{ usuario.nombre }}</p>
+            <p><strong>Email:</strong> {{ usuario.email }}</p>
+            <p><strong>Fecha de Registro:</strong> {{ usuario.fecha_registro }}</p>
+        </section>
+        <section class="actividad-reciente">
+            <h2>Actividad Reciente</h2>
+            <ul>
+                {% for actividad in usuario.actividades %}
+                <li>{{ actividad }}</li>
+                {% endfor %}
+            </ul>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 Mi Aplicación Web</p>
+    </footer>
+
+</html>

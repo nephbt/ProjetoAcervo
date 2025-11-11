@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Gerenciar Livros</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+</head>
+
+<body>
+    <header>
+        <div id="logo">
+            <img src="static\images\default.png" alt="Logo da Biblioteca"> <!-- Substitua por seu logo -->
+        </div>
+        <nav>
+            <a href="minhas_leituras">Registo Leitura</a>
+            <a href="crudes_livros">CRUDE</a>
+            <a href="perfil">Perfil</a>
+
+        </nav>
+    </header>
+
+    <h1>Gerenciamento de Livros</h1>
+
+    <section>
+        <h2>Cadastrar novo livro</h2>
+        <form id="formLivro">
+            <label>Título:</label><br>
+            <input type="text" name="titulo" required><br><br>
+
+            <label>Autor:</label><br>
+            <input type="text" name="autor" required><br><br>
+
+            <label>Gênero:</label><br>
+            <input type="text" name="genero" required><br><br>
+
+            <label>Ano de Publicação:</label><br>
+            <input type="number" name="ano_publicacao" required><br><br>
+
+            <label>URL da Imagem:</label><br>
+            <input type="text" name="imagem"><br><br>
+
+            <button type="submit">Cadastrar</button>
+        </form>
+    </section>
+
+    <hr>
+
+    <section>
+        <h2>Lista de livros</h2>
+        <input type="text" id="busca" placeholder="Buscar por título, autor ou gênero...">
+        <button id="btnBuscar">Buscar</button>
+        <button id="btnAtualizar">Atualizar lista</button>
+
+        <table border="1" cellpadding="5" style="margin-top:10px;">
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Autor</th>
+                    <th>Gênero</th>
+                    <th>Ano</th>
+                    <th>Imagem</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabelaLivros"></tbody>
+        </table>
+    </section>
+
+    <p id="mensagem"></p>
+
+    <!-- Modal de Edição de Livro -->
+    <div id="modalEditar" class="modal">
+        <div class="modal-content">
+            <span id="fecharModal" class="fechar">&times;</span>
+            <h2>Editar Livro</h2>
+            <form id="formEditar">
+                <input type="hidden" id="editarId">
+
+                <label>Título:</label><br>
+                <input type="text" id="editarTitulo" required><br><br>
+
+                <label>Autor:</label><br>
+                <input type="text" id="editarAutor" required><br><br>
+
+                <label>Gênero:</label><br>
+                <input type="text" id="editarGenero" required><br><br>
+
+                <label>Ano de Publicação:</label><br>
+                <input type="number" id="editarAno" required><br><br>
+
+                <label>URL da Imagem:</label><br>
+                <input type="text" id="editarImagem"><br><br>
+
+                <button type="submit">Salvar Alterações</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Rodapé -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section sobre">
+                <h3>📚 Biblioteca Sugestões</h3>
+                <p>Uma plataforma para registrar e descobrir novas leituras. Explore, avalie os seus livros favoritos!
+                </p>
+            </div>
+
+            <div class="footer-section links">
+                <h4>Links Rápidos</h4>
+                <ul>
+                    <li><a href="/home_page_usuarios">Início</a></li>
+                    <li><a href="/livros">Livros do banco (somente visual)</a></li>
+                    <li><a href="/usuarios">Usuarios do banco (somente visual)</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section contato">
+                <h4>Contato</h4>
+                <p>📧 projetoacervo@gmail.com</p>
+                <p>📞 (62) 98567-9987</p>
+                <div class="social">
+                    <a href="#"><img src="/static/images/facebook.png" alt="Facebook"></a>
+                    <a href="#"><img src="/static/images/instagram.png" alt="Instagram"></a>
+                </div>
+            </div>
+        </div>
+
+
+        <script src="{{ url_for('static', filename='js/gerenciar_livros.js') }}"></script>
+</body>
+
+</html>

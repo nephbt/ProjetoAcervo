@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteca Sugestões</title>
+    <link rel="stylesheet" href="../static/css/home.css">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/default.png') }}">
+    <!-- logo na aba /\-->
+
+</head>
+
+<body>
+    <!-- Cabeçalho -->
+    <header>
+        <div id="logo">
+            <img src="static\images\default.png" alt="Logo da Biblioteca"> <!-- Substitua por seu logo -->
+        </div>
+        <nav>
+            <a href="minhas_leituras">Registo Leitura</a>
+            <a href="crudes_livros">CRUDE</a>
+            <a href="perfil">Perfil</a>
+
+        </nav>
+    </header>
+
+    <!-- Corpo -->
+    <main class="fade-in">
+        <h1>Bem-vindo à Biblioteca Sugestões</h1>
+        <p>Descubra novos livros baseados no que você já leu! Faça login ou registre-se para ver recomendações
+            personalizadas.</p>
+        <section id="sugestoes">
+            <h2>Sugestões do Dia</h2>
+            <p>Clique no botão abaixo para ver sugestões baseadas em seus livros lidos.</p>
+            <button id="toggle-sugestoes">Mostrar Sugestões</button>
+            <ul id="lista-sugestoes">
+                <li>Se você gostou de "1984" de George Orwell, recomendamos "Fahrenheit 451" de Ray Bradbury.</li>
+                <li>Para fãs de ficção científica, experimente "Dune" de Frank Herbert.</li>
+                <li>Baseado em romances clássicos, leia "Orgulho e Preconceito" de Jane Austen.</li>
+            </ul>
+        </section>
+    </main>
+
+    <!-- Rodapé -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section sobre">
+                <h3>📚 Biblioteca Sugestões</h3>
+                <p>Uma plataforma para registrar e descobrir novas leituras. Explore, avalie os seus livros favoritos!
+                </p>
+            </div>
+
+            <div class="footer-section links">
+                <h4>Links Rápidos</h4>
+                <ul>
+                    <li><a href="/home_page_usuarios">Início</a></li>
+                    <li><a href="/livros">Livros</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section contato">
+                <h4>Contato</h4>
+                <p>📧 projetoacervo@gmail.com</p>
+                <p>📞 (62) 98567-9987</p>
+                <div class="social">
+                    <a href="#"><img src="/static/images/facebook.png" alt="Facebook"></a>
+                    <a href="#"><img src="/static/images/instagram.png" alt="Instagram"></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+
+            <!-- JavaScript -->
+            <script>
+                // Animação de fade-in na página
+                document.addEventListener('DOMContentLoaded', function () {
+                    document.body.classList.add('fade-in');
+                });
+
+                // Toggle para mostrar/ocultar sugestões
+                const toggleButton = document.getElementById('toggle-sugestoes');
+                const listaSugestoes = document.getElementById('lista-sugestoes');
+
+                toggleButton.addEventListener('click', function () {
+                    if (listaSugestoes.style.display === 'none' || listaSugestoes.style.display === '') {
+                        listaSugestoes.style.display = 'block';
+                        toggleButton.textContent = 'Ocultar Sugestões';
+                    } else {
+                        listaSugestoes.style.display = 'none';
+                        toggleButton.textContent = 'Mostrar Sugestões';
+                    }
+                });
+            </script>
+</body>
+
+</html>
