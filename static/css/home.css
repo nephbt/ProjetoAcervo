@@ -8,11 +8,9 @@
 /* Corpo geral */
 body {
     font-family: 'Georgia', serif;
-    /* Fonte elegante para livros */
     line-height: 1.6;
     color: #333;
     background: linear-gradient(to bottom, #e8f4f8, #ffffff);
-    /* Gradiente sutil */
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -21,18 +19,21 @@ body {
 /* Cabeçalho */
 header {
     background: linear-gradient(90deg, #4a90e2, #357abd);
-    /* Azul biblioteca */
     color: white;
     padding: 20px;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     position: sticky;
     top: 0;
     z-index: 10;
     width: 100%;
-    /* Garante que cubra toda a largura */
+}
+
+#logo {
+    position: absolute;
+    left: 20px;
 }
 
 #logo img {
@@ -67,10 +68,44 @@ main {
     margin: 0 auto;
 }
 
+main.centralizado {
+    flex: 1;
+    padding: 80px 20px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
 h1 {
     font-size: 2.5em;
     margin-bottom: 20px;
     color: #4a90e2;
+    text-align: center;
+}
+
+#formUsuario {
+    background: linear-gradient(135deg, #d4ebf7 10%, #d9e9f5 100%);
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border: 3px solid #4a90e2;
+    max-width: 500px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+#formLogin {
+    background: linear-gradient(135deg, #d4ebf7 10%, #d9e9f5 100%);
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border: 3px solid #4a90e2;
+    max-width: 500px;
+    width: 100%;
+    margin: 0 auto;
 }
 
 p {
@@ -98,11 +133,52 @@ p {
     padding: 0;
 }
 
+label:first-of-type {
+    margin-top: 0;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    color: #357abd;
+    margin-bottom: 3px;
+    font-size: 1.1em;
+    margin-top: 10px;
+    margin-top: 5px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="date"] {
+    width: 100%;
+    padding: 7px;
+    border: 2px solid #4a90e2;
+    border-radius: 5px;
+    font-size: 1em;
+    font-family: 'Georgia', serif;
+    transition: border-color 0.3s ease;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="date"]:focus {
+    outline: none;
+    border-color: #4a90e2;
+    border-color: #357abd;
+    background-color: white;
+    box-shadow: 0 0 8px rgba(74, 144, 226, 0.4);
+}
+
 #lista-sugestoes li {
     padding: 10px;
     border-bottom: 1px solid #eee;
 }
 
+/* Estilo do botão geral */
 button {
     background: #4a90e2;
     color: white;
@@ -118,6 +194,26 @@ button:hover {
     background: #357abd;
 }
 
+/* Botão de envio */
+button[type="submit"] {
+    width: 100%;
+    background: #4a90e2;
+    color: white;
+    border: none;
+    padding: 15px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: bold;
+    transition: background 0.3s ease, transform 0.2s ease;
+    margin-top: 10px;
+}
+
+button[type="submit"]:active {
+    transform: translateY(0);
+}
+
+
 /* Rodapé */
 footer {
     background: #222;
@@ -126,6 +222,47 @@ footer {
     font-family: Arial, sans-serif;
     margin-top: auto;
     width: 100%;
+}
+
+#mensagem {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+    display: none;
+}
+
+#mensagem.sucesso {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    display: block;
+}
+
+#mensagem.erro {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    display: block;
+}
+
+/* Link de voltar */
+.link-voltar {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.link-voltar a {
+    color: #4a90e2;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.link-voltar a:hover {
+    color: #357abd;
+    text-decoration: underline;
 }
 
 .footer-container {
@@ -153,6 +290,7 @@ footer {
 .footer-section p {
     font-size: 14px;
     line-height: 1.5;
+    margin-bottom: 5px;
 }
 
 .footer-section ul {
@@ -173,6 +311,173 @@ footer {
 .footer-section ul li a:hover {
     color: #ffcc00;
 }
+
+section {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+    max-width: 1100px;
+}
+
+section h2 {
+    color: #357abd;
+    margin-bottom: 20px;
+    font-size: 1.8em;
+    border-bottom: 2px solid #4a90e2;
+    padding-bottom: 10px;
+}
+
+#formLivro {
+    background: linear-gradient(135deg, #d4ebf7 10%, #d9e9f5 100%);
+    padding: 10px 10px;
+    border-radius: 10px;
+    border: 3px solid #4a90e2;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+#formLivro label {
+    display: block;
+    font-weight: bold;
+    color: #357abd;
+    margin-bottom: 5px;
+    margin-top: 8px;
+    font-size: 1.2em;
+}
+
+#formLivro label:first-of-type {
+    margin-top: 0;
+}
+
+#formLivro input[type="text"],
+#formLivro input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #4a90e2;
+    border-radius: 5px;
+    font-size: 1em;
+    font-family: 'Georgia', serif;
+    margin-bottom: 8px;
+    background-color: #f9f9f9;
+    transition: all 0.3s ease;
+}
+
+#formLivro input:focus {
+    outline: none;
+    border-color: #357abd;
+    background-color: white;
+    box-shadow: 0 0 8px rgba(74, 144, 226, 0.4);
+}
+
+#formLivro button {
+    width: 100%;
+    margin-top: 12px;
+}
+
+/* Área de busca */
+#busca {
+    width: 60%;
+    padding: 10px;
+    border: 2px solid #4a90e2;
+    border-radius: 5px;
+    font-size: 1em;
+    margin-right: 10px;
+}
+
+#btnBuscar,
+#btnAtualizar {
+    padding: 10px 20px;
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+#btnBuscar {
+    background: #4CAF50;
+}
+
+#btnBuscar:hover {
+    background: #45a049;
+}
+
+#btnAtualizar {
+    background: #ff9800;
+}
+
+#btnAtualizar:hover {
+    background: #e68900;
+}
+
+/* Tabela de livros */
+table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+table thead {
+    background: linear-gradient(90deg, #4a90e2, #357abd);
+    color: white;
+}
+
+table th {
+    padding: 15px;
+    text-align: left;
+    font-weight: bold;
+    font-size: 1em;
+}
+
+table tbody tr {
+    border-bottom: 1px solid #e0e0e0;
+    transition: background 0.3s ease;
+}
+
+table tbody tr:hover {
+    background: #f0f8ff;
+}
+
+table td {
+    padding: 12px 15px;
+    color: #333;
+}
+
+table td img {
+    width: 60px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 5px;
+    border: 2px solid #ddd;
+}
+
+/* Botões de ação na tabela */
+table button {
+    padding: 6px 12px;
+    margin: 0 3px;
+    font-size: 0.9em;
+    border-radius: 4px;
+}
+
+table button.btn-editar {
+    background: #2196F3;
+}
+
+table button.btn-editar:hover {
+    background: #0b7dda;
+}
+
+table button.btn-excluir {
+    background: #f44336;
+}
+
+table button.btn-excluir:hover {
+    background: #da190b;
+}
+
 
 .social a {
     display: inline-block;
@@ -212,6 +517,11 @@ footer {
     align-items: center;
 }
 
+.modal.ativo {
+    display: flex;
+}
+
+/*
 .modal-content {
     background-color: white;
     padding: 20px;
@@ -219,13 +529,102 @@ footer {
     width: 400px;
     position: relative;
 }
+*/
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-content h2 {
+    color: #4a90e2;
+    margin-bottom: 20px;
+    font-size: 1.8em;
+    border-bottom: 2px solid #4a90e2;
+    padding-bottom: 10px;
+}
 
 .fechar {
     position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 22px;
+    top: 15px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #999;
     cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.fechar:hover {
+    color: #f44336;
+}
+
+/* Formulário do modal */
+#formEditar {
+    background: linear-gradient(135deg, #d4ebf7 10%, #d9e9f5 100%);
+    padding: 25px;
+    border-radius: 10px;
+    border: 2px solid #4a90e2;
+}
+
+#formEditar label {
+    display: block;
+    font-weight: bold;
+    color: #357abd;
+    margin-bottom: 5px;
+    margin-top: 10px;
+    font-size: 0.95em;
+}
+
+#formEditar label:first-of-type {
+    margin-top: 0;
+}
+
+#formEditar input[type="text"],
+#formEditar input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #4a90e2;
+    border-radius: 5px;
+    font-size: 1em;
+    font-family: 'Georgia', serif;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+    transition: all 0.3s ease;
+}
+
+#formEditar input:focus {
+    outline: none;
+    border-color: #357abd;
+    background-color: white;
+    box-shadow: 0 0 8px rgba(74, 144, 226, 0.4);
+}
+
+#formEditar button {
+    width: 100%;
+    margin-top: 15px;
+    background: #4CAF50;
+}
+
+#formEditar button:hover {
+    background: #45a049;
 }
 
 /* Estrelas */
@@ -313,12 +712,49 @@ footer {
     h1 {
         font-size: 2em;
     }
+
+    #formUsuario {
+        padding: 30px 20px;
+    }
+
+    section {
+        padding: 20px;
+    }
+
+    #busca {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    #btnBuscar,
+    #btnAtualizar {
+        width: 48%;
+        margin-right: 2%;
+    }
+
+    table {
+        font-size: 0.85em;
+    }
+
+    table th,
+    table td {
+        padding: 8px;
+    }
+
+    table td img {
+        width: 40px;
+        height: 55px;
+    }
+
+    .modal-content {
+        width: 95%;
+        padding: 20px;
+    }
 }
 
-/* Animação de fade-in */
 .fade-in {
     opacity: 0;
-    animation: fadeIn 1s ease-in forwards;
+    animation: fadeIn 0.8s ease-in forwards;
 }
 
 @keyframes fadeIn {

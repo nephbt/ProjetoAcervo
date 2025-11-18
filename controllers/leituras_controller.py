@@ -43,7 +43,7 @@ def registrarLeitura(usuario_id, livro_id, usuario, livro):
 @leiturasRoute.route("/<usuario_id>", methods=['get'])
 @requerir_token
 @verificar_usuario
-def carregarLeiturasUsuario(id_usuario, usuario_id):
+def carregarLeiturasUsuario(usuario_id, usuario):
     leituras = bd.carregarLeituras(usuario_id)
     if not leituras:
         return jsonify({"Erro": "Nenhuma leitura encontrada"}), 404
