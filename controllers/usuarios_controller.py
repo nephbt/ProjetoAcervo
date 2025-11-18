@@ -1,7 +1,6 @@
 from flask import Blueprint, jsonify, render_template, request, session
 from database import bd
 from controllers.auth_utils import gerar_token, requerir_token, verificar_usuario
-import uuid
 
 usuariosRoute = Blueprint("usuarios", __name__, url_prefix="/usuarios")
 
@@ -9,7 +8,6 @@ usuariosRoute = Blueprint("usuarios", __name__, url_prefix="/usuarios")
 def cadastrarUsuario():
     data = request.get_json() if request.is_json else request.form
     novo_usuario = bd.cadastrarUsuario(
-        str(uuid.uuid4()),
         data["nome"],
         data["email"],
         data["senha"],
@@ -21,7 +19,7 @@ def cadastrarUsuario():
 
     return jsonify(novo_usuario.to_dict()), 201
 
-@usuariosRoute.route("/login", methods=['POST'])
+@usuariosRoute.route("/login", methods=['post'])
 def login():
     data = request.get_json() if request.is_json else request.form
     usuario = bd.buscarEmail(data.get("email"))
@@ -49,9 +47,11 @@ def retornarUsuarioId(usuario_id):
 def retornarUsuario():
     return jsonify([usuario.to_dict() for usuario in bd.usuarios.values()]), 200
 
-@usuariosRoute.route("/perfil", methods=["GET"])
+@usuariosRoute.route("/perfil", methods=["get"])
 @requerir_token
 def perfil(id_usuario):
     return jsonify({"mensagem": f"Bem-vindo usuário {id_usuario}!"}), 200
+
+
 
 

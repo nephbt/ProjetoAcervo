@@ -11,13 +11,22 @@ class Livro:
         self.imagem_url = imagem_url
 
 class Usuario:
-    def __init__(self, nome, email, senha, data_nasc):
-        self.id = str(uuid.uuid4()) # Vamos gerar IDs aleatorios e seguros
+    def __init__(self, nome, email, senha=None, data_nasc=None, senha_hash=None):
+        self.id = str(uuid.uuid4())  # IDs aleatórios e seguros
         self.nome = nome
         self.email = email
-        self._senha_hash = bcrypt.hashpw(senha.encode(), bcrypt.gensalt()) # Vamos criptografar a senha do usuário
         self.data_nasc = data_nasc
-        self.leituras = [] # Array de leituras
+        self.leituras = []  # Array de leituras
+
+        # Se vier o hash do banco = usa diretamente
+        if senha_hash is not None:
+            self._senha_hash = senha_hash
+
+        # Se for criação normal = criptografa a senha
+        else:
+            if senha is None:
+                raise ValueError("Senha é obrigatória para novos usuários.")
+            self._senha_hash = bcrypt.hashpw(senha.encode(), bcrypt.gensalt())
 
     def registrarLeitura(self, livro, status, avaliacao, data_leitura):
         leitura = Leitura(self.id, livro.id, status, avaliacao, data_leitura)
