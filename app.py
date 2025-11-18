@@ -28,7 +28,6 @@ app.register_blueprint(pagesRoute)
 
 @app.route("/")
 def homepage():
-    # Aqui futuramente você pode retornar seu "index.html"
     return render_template("index.html")
 
 @app.route("/login_usuario")

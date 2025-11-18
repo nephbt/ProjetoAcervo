@@ -6,17 +6,10 @@ def criar_tabelas(db_path='projeto_acervo'):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
-    # Como não foi feito antes a adição da url então tive que alterar a tabela
-    try:
-        cursor.execute("ALTER TABLE livros ADD COLUMN imagem_url TEXT")
-    except sqlite3.OperationalError:
-        # coluna já existe
-        pass
-
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS livros (
             id TEXT PRIMARY KEY NOT NULL,
-            titulo VARCHAR NOT NULL,
+            titulo VARCHAR NOT NULL, 
             autor VARCHAR NOT NULL,
             genero VARCHAR NOT NULL,
             ano_publicacao INT NOT NULL,
@@ -33,8 +26,6 @@ def criar_tabelas(db_path='projeto_acervo'):
             data_nasc DATE NOT NULL
         )
     ''')
-
-    # Caso você ainda estiver com a tabela de leituras antiga ativa essa linha e executa, dpa apaga. cursor.execute("DROP TABLE IF EXISTS leituras")
 
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS leituras (
@@ -72,7 +63,7 @@ def restaurar_backup(db_path='projeto_acervo', backup_path='backup.sql'):
 class BancoDados:
     def __init__(self, db_path='projeto_acervo'):
         self.db_path = db_path
-        self.conn = sqlite3.connect(self.db_path, check_same_thread=False)  # 👈 ADICIONE ESTA LINHA
+        self.conn = sqlite3.connect(self.db_path, check_same_thread=False)
         criar_tabelas(self.db_path)
         self.livros = {}
         self.usuarios = {}
@@ -136,7 +127,7 @@ class BancoDados:
         conn.close()
         return livro
 
-    
+
     def buscarLivroPorId(self, livro_id):
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
@@ -158,15 +149,21 @@ class BancoDados:
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
-        cursor.execute("SELECT id, nome, email, senha, data_nasc FROM usuarios")
+        cursor.execute("SELECT id, nome, email, data_nasc FROM usuarios")
         for row in cursor.fetchall():
-            usuario = Usuario(row[1], row[2], row[3], row[4])
+            usuario = Usuario(
+                nome=row[1],
+                email=row[2],
+                senha="",
+                data_nasc=row[3]
+            )
             usuario.id = row[0]
+            usuario._senha_hash = None  # NÃO CARREGAR SENHA
             self.usuarios[usuario.id] = usuario
 
         conn.close()
 
-    def cadastrarUsuario(self, id, nome, email, senha, data_nasc):
+    def cadastrarUsuario(self, nome, email, senha, data_nasc):
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT * FROM usuarios WHERE email = ?", (email,))
@@ -181,7 +178,7 @@ class BancoDados:
 
             cursor.execute(
                 "INSERT INTO usuarios (id, nome, email, senha, data_nasc) VALUES (?, ?, ?, ?, ?)",
-                (id, nome, email, senha, data_nasc)
+                (usuario.id, nome, email, usuario._senha_hash.decode(), usuario.data_nasc)
             )
 
         self.usuarios[usuario.id] = usuario
@@ -197,15 +194,21 @@ class BancoDados:
         row = cursor.fetchone() # Registramos a coluna com o que foi encontrado (ou retorna null :p)
 
         if row: # Caso seja encontrado, registra o usuário para retorná-lo
-            usuario = Usuario(row[1], row[2], row[3], row[4])
+            usuario = Usuario(
+                nome=row[1],
+                email=row[2],
+                senha_hash=row[3].encode(),
+                data_nasc=row[4]
+            )
             usuario.id = row[0]
-            # Retornamos usuario para validação
+            self.usuarios[usuario.id] = usuario
             return usuario
 
         conn.close()
         return None
 
-############################################
+
+    ############################################
         ########## LEITURAS ##########
             ####################
 
@@ -226,7 +229,7 @@ class BancoDados:
         conn.close()
         return leituras
 
-    
+
     def cadastrarLeitura(self, idUsuario, idLivro, status, avaliacao, dataLeitura, comentario):
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
@@ -259,7 +262,7 @@ class BancoDados:
 
         leitura = Leitura(idUsuario, idLivro, status, avaliacao, dataLeitura)
         return leitura
-    
-        
+
+
 bd = BancoDados()  # instância única para toda a aplicação
 ############################################
