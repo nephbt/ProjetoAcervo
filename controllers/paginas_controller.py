@@ -2,7 +2,7 @@ from flask import Blueprint, render_template
 from controllers.auth_utils import requerir_token
 from flask import Blueprint, render_template, session, redirect, url_for
 from database import bd
-from flask import Blueprint, render_template, session
+from flask import Blueprint, render_template, session, request, jsonify
 
 # Blueprint para páginas HTML
 pagesRoute = Blueprint("pages", __name__)
