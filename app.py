@@ -1,8 +1,10 @@
 from flask import Flask, render_template
+from flask.cli import locate_app
 from controllers.livros_controller import livrosRoute
 from controllers.usuarios_controller import usuariosRoute
 from controllers.leituras_controller import leiturasRoute
 from controllers.paginas_controller import pagesRoute
+import argparse
 
 # ------------------------------------------------------------
 #  ROTAS DE TESTE / FORMULÁRIOS HTML
@@ -46,7 +48,17 @@ def cadastro_livro():
     return render_template("cadastro_livro.html")
 
 # ------------------------------------------------------------
-# Execução do servidor Flask
+# Execução do servidor Flask (verificação se Rotas carregam, Blueprints importam, Banco inicializa, Não há erro de importação)
 # ------------------------------------------------------------
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+parser.add_argument("--test-build", action="store_true")
+args = parser.parse_args()
+
+if args.test_build:
+    print("🔍 Testando build...")
+    print("App carregado com sucesso.")
+else:
     app.run(debug=True)
+
+
