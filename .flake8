@@ -1,0 +1,18 @@
+# Ignorar pastas do ambiente virtual e outras que não são código fonte
+[flake8]
+exclude =
+    .git,
+    __pycache__,
+    .venv,
+    venv,
+    migrations,
+    static,
+    templates,
+    htmlcov,
+    .pytest_cache
+max-line-length = 120
+
+
+
+# Ignorar certos códigos de erro/aviso
+ignore = E501,F401

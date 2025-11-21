@@ -6,7 +6,6 @@ from app import app
 def client():
     return app.test_client()
 
-
 def test_registrar_leitura_sucesso(client):
     mock_usuario = type("Usuario", (), {"id": "123", "nome": "João"})()
     mock_livro = type("Livro", (), {"id": "456", "titulo": "Livro A"})()
