@@ -47,10 +47,15 @@ jobs:
 
       # 6. Segurança (bandit)
       - name: Verificar vulnerabilidades com Bandit
-        run: bandit -r .
+        env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          FLASK_DEBUG: "False"
+        run: bandit -r . -x tests
 
       # 7. Build (ver se a aplicação inicia sem erros)
       - name: Verificar build da aplicação
+        env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: python app.py --test-build
 
       # 8. Testes com coverage
@@ -58,6 +63,7 @@ jobs:
         env:
           FLASK_ENV: testing
           PYTHONPATH: .
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: |
           pytest -v --cov=./ --cov-report=xml --disable-warnings --maxfail=1
 

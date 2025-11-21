@@ -5,6 +5,7 @@ from controllers.usuarios_controller import usuariosRoute
 from controllers.leituras_controller import leiturasRoute
 from controllers.paginas_controller import pagesRoute
 import argparse
+import os
 
 # ------------------------------------------------------------
 #  ROTAS DE TESTE / FORMULÁRIOS HTML
@@ -17,7 +18,8 @@ import argparse
 # ------------------------------------------------------------
 
 app = Flask(__name__)
-app.secret_key = "chave_muito_secreta"
+# Configuração da chave secreta para sessões
+app.secret_key = os.getenv("SECRET_KEY") or "dev-secret-key"
 
 # Registro dos blueprints
 app.register_blueprint(livrosRoute)
@@ -59,6 +61,8 @@ if __name__ == "__main__":
         print("🔍 Testando build...")
         print("App carregado com sucesso.")
     else:
-        app.run(debug=True)
+        debug_mode = os.getenv("FLASK_DEBUG", "False") == "True"
+        app.run(debug=debug_mode)
+
 
 

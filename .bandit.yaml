@@ -1,0 +1,13 @@
+skips:
+  - B101
+
+exclude_dirs:
+  - ".venv"
+  - "venv"
+  - "env"
+  - "__pycache__"
+  - ".git"
+  - "static"
+  - "node_modules"
+  - "migrations"
+  - "tests"
