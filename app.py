@@ -52,13 +52,13 @@ def cadastro_livro():
 # ------------------------------------------------------------
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-parser.add_argument("--test-build", action="store_true")
-args = parser.parse_args()
+    parser.add_argument("--test-build", action="store_true")
+    args = parser.parse_args()
 
-if args.test_build:
-    print("🔍 Testando build...")
-    print("App carregado com sucesso.")
-else:
-    app.run(debug=True)
+    if args.test_build:
+        print("🔍 Testando build...")
+        print("App carregado com sucesso.")
+    else:
+        app.run(debug=True)
 
 
