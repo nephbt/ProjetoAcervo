@@ -91,7 +91,10 @@ jobs:
 
       # 3️⃣ Login Railway
       - name: Login Railway
-        run: railway login --apiKey ${{ secrets.RAILWAY_API_KEY }}
+        env:
+          RAILWAY_API_KEY: ${{ secrets.RAILWAY_API_KEY }}
+        run: railway login
+
 
       # 4️⃣ Deploy para Railway
       - name: Deploy para Railway
