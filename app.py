@@ -4,18 +4,9 @@ from controllers.usuarios_controller import usuariosRoute
 from controllers.leituras_controller import leiturasRoute
 from controllers.paginas_controller import pagesRoute
 
-# ------------------------------------------------------------
-#  ROTAS DE TESTE / FORMULÁRIOS HTML
-# ------------------------------------------------------------
-# Para acessar as páginas no navegador:
-#  - Cadastro de usuários: http://127.0.0.1:5000/cadastro_usuario
-#  - API de usuários (JSON): http://127.0.0.1:5000/usuarios
-#  - Cadastro de livros: http://127.0.0.1:5000/cadastro_livro
-#  - API de livros (JSON): http://127.0.0.1:5000/livros
-# ------------------------------------------------------------
-
 app = Flask(__name__)
 app.secret_key = "chave_muito_secreta"
+
 
 # Registro dos blueprints
 app.register_blueprint(livrosRoute)
@@ -25,7 +16,7 @@ app.register_blueprint(pagesRoute)
 
 # ------------------------------------------------------------
 # Rotas principais de páginas HTML
-
+# ------------------------------------------------------------
 
 @app.route("/")
 def homepage():
@@ -48,7 +39,6 @@ def cadastro_usuario():
 def cadastro_livro():
     # Página de cadastro de livros
     return render_template("cadastro_livro.html")
-
 
 # ------------------------------------------------------------
 # Execução do servidor Flask
