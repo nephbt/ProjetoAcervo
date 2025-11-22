@@ -89,13 +89,8 @@ jobs:
           curl -fsSL https://railway.app/install.sh | sh
           export PATH=$PATH:$HOME/.railway/bin
 
-      # 3️⃣ Login Railway
-      - name: Login Railway
+      # 3️⃣ Deploy para Railway
+      - name: Deploy para Railway
         env:
           RAILWAY_API_KEY: ${{ secrets.RAILWAY_API_KEY }}
-        run: railway login
-
-
-      # 4️⃣ Deploy para Railway
-      - name: Deploy para Railway
         run: railway up --environment production
