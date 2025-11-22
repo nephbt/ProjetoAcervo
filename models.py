@@ -2,7 +2,7 @@ import uuid
 import bcrypt
 
 class Livro:
-    def __init__(self, titulo, autor, genero, ano_publicacao, imagem_url=None): # Modificação em colocar a url
+    def __init__(self, titulo, autor, genero, ano_publicacao, imagem_url=None):
         self.id = str(uuid.uuid4())
         self.titulo = titulo
         self.autor = autor

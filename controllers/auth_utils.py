@@ -7,13 +7,15 @@ from database import BancoDados
 bd = BancoDados()
 key = "chave_bem_secreta"
 
+
 def gerar_token(usuario_id):
     payload = {
         "id": usuario_id,
-        "exp": datetime.datetime.now() + datetime.timedelta(hours=2)
+        "exp": datetime.datetime.now() + datetime.timedelta(hours=2),
     }
     token = jwt.encode(payload, key, algorithm="HS256")
     return token
+
 
 def requerir_token(f):
     @wraps(f)
@@ -33,7 +35,9 @@ def requerir_token(f):
             return jsonify({"erro": "Token inválido"}), 401
 
         return f(id_usuario=id_usuario, *args, **kwargs)
+
     return decorator
+
 
 def verificar_usuario(f):
     @wraps(f)
@@ -44,6 +48,7 @@ def verificar_usuario(f):
             return jsonify({"Erro": "Usuário não encontrado"}), 404
         # substitui usuario_id pelo objeto usuário
         return f(usuario=usuario, *args, **kwargs)
+
     return decorator
 
 
@@ -62,6 +67,5 @@ def verificar_livro(f):
 
         # passa o objeto livro adiante para a rota
         return f(livro=livro, *args, **kwargs)
+
     return decorator
-
-
