@@ -92,5 +92,5 @@ jobs:
       # 3️⃣ Deploy para Railway
       - name: Deploy para Railway
         env:
-          RAILWAY_API_KEY: ${{ secrets.RAILWAY_API_KEY }}
+          RAILWAY_API_KEY: ${{ secrets.SECRET_KEY }}
         run: railway up --environment production
