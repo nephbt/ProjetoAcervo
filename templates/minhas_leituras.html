@@ -1,29 +1,28 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minhas Leituras</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
-
-
 </head>
 
 <body>
     <!-- Cabeçalho -->
     <header>
         <div id="logo">
-            <img src="static\images\default.png" alt="Logo da Biblioteca">
+            <img src="static/images/logo.png" alt="Logo da Biblioteca">
         </div>
         <nav>
             <a href="/home_page_usuarios">Início</a>
-            <a href="crudes_livros">Registro de Leitura</a>
-            <a href="#">Sobre Nós</a>
+            <a href="/crudes_livros">Cadastro de livros</a>
+            <a href="/perfil">Perfil</a>
         </nav>
     </header>
 
-    <h1>Minhas Leituras</h1>
+    <main style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+        <h1>Adicionar leituras</h1>
 
     <!-- Campo de pesquisa -->
     <input type="text" id="pesquisaLivro" placeholder="Pesquisar livros por título ou autor">
@@ -46,13 +45,10 @@
                     <option value="quer_ler">Quer Ler</option>
                 </select><br><br>
 
-                <label>Avaliação:</label>
-                <div class="estrelas" id="estrelas">
-                    <span data-value="1">&#9733;</span>
-                    <span data-value="2">&#9733;</span>
-                    <span data-value="3">&#9733;</span>
-                    <span data-value="4">&#9733;</span>
-                    <span data-value="5">&#9733;</span>
+                <label>Avaliação (0-10):</label>
+                <div style="margin: 15px 0;">
+                    <input type="range" id="avaliacao-slider" min="0" max="10" value="0" style="width: 100%;">
+                    <p id="notaSelecionada" style="margin-top: 10px; font-weight: bold; text-align: center;">Nota: 0/10</p>
                 </div><br>
 
                 <label>Comentário (opcional):</label><br>
@@ -70,18 +66,15 @@
     <footer>
         <div class="footer-container">
             <div class="footer-section sobre">
-                <h3>📚 Biblioteca Sugestões</h3>
-                <p>Uma plataforma para registrar e descobrir novas leituras. Explore, avalie os seus livros favoritos!
-                </p>
+                <h3>Acervo</h3>
+                <p>Uma plataforma para registrar e descobrir novas leituras. Explore, avalie e descubra os seus livros favoritos!</p>
             </div>
 
             <div class="footer-section links">
-                <h4>Links Rápidos</h4>
+                <h4>Links rápidos</h4>
                 <ul>
-                    <li><a href="/">Início</a></li>
+                    <li><a href="/home_page_usuarios">Início</a></li>
                     <li><a href="/livros">Livros</a></li>
-                    <li><a href="/login_usuario">Login</a></li>
-                    <li><a href="/cadastro_usuario">Cadastro</a></li>
                 </ul>
             </div>
 
@@ -96,26 +89,159 @@
             </div>
         </div>
 
-
         <div class="footer-bottom">
+            <p>&copy; 2025 Projeto Acervo — Todos os direitos reservados.</p>
+        </div>
+    </footer>
 
-            <script src="/static/js/leituras.js"></script>
-            <script>
-                document.addEventListener("DOMContentLoaded", () => {
-                    iniciarMinhasLeituras();
+    <script>
+        let avaliacao = 0;
 
-                    // Pesquisa de livros
-                    const inputPesquisa = document.getElementById("pesquisaLivro");
-                    inputPesquisa.addEventListener("input", () => {
-                        const query = inputPesquisa.value.toLowerCase();
-                        document.querySelectorAll(".livro-card").forEach(card => {
-                            const titulo = card.querySelector("h3").textContent.toLowerCase();
-                            const autor = card.querySelector("p").textContent.toLowerCase();
-                            card.style.display = titulo.includes(query) || autor.includes(query) ? "block" : "none";
-                        });
-                    });
+        document.addEventListener("DOMContentLoaded", () => {
+            console.log('🚀 Iniciando Minhas Leituras...');
+            iniciarMinhasLeituras();
+
+            // Pesquisa de livros
+            const inputPesquisa = document.getElementById("pesquisaLivro");
+            inputPesquisa.addEventListener("input", () => {
+                const query = inputPesquisa.value.toLowerCase();
+                document.querySelectorAll(".livro-card").forEach(card => {
+                    const titulo = card.querySelector("h3").textContent.toLowerCase();
+                    const autor = card.querySelector("p").textContent.toLowerCase();
+                    card.style.display = titulo.includes(query) || autor.includes(query) ? "block" : "none";
                 });
-            </script>
-</body>
+            });
+        });
+
+        async function iniciarMinhasLeituras() {
+            const livrosGrid = document.getElementById("livrosGrid");
+            const modal = document.getElementById("modalLeitura");
+            const fecharModal = document.getElementById("fecharModal");
+            const formLeitura = document.getElementById("formLeitura");
+            const livroIdInput = document.getElementById("livroId");
+            const sliderAvaliacao = document.getElementById("avaliacao-slider");
+            const notaSelecionada = document.getElementById("notaSelecionada");
+
+            // Pegar token do localStorage
+            const token = localStorage.getItem("token");
+            if (!token) {
+                alert("Você precisa estar logado!");
+                window.location.href = "/login_usuario";
+                return;
+            }
+
+            console.log('🔑 Token encontrado');
+
+            // Função para carregar livros
+            async function carregarLivros() {
+                console.log('📚 Carregando livros...');
+                const resp = await fetch("/livros/");
+                const livros = await resp.json();
+                console.log("✅ Livros carregados:", livros.length);
+
+                livrosGrid.innerHTML = "";
+                livros.forEach(livro => {
+                    const imagem = livro.imagem_url && livro.imagem_url.trim() !== ""
+                        ? livro.imagem_url
+                        : "/static/images/default.png";
+
+                    const card = document.createElement("div");
+                    card.className = "livro-card";
+                    card.innerHTML = `
+                        <img src="${imagem}" alt="${livro.titulo}" onerror="this.src='/static/images/default.png'">
+                        <h3>${livro.titulo}</h3>
+                        <p>${livro.autor} - ${livro.ano_publicacao}</p>
+                        <button onclick="abrirModal('${livro.id}')">Marcar como lido</button>
+                    `;
+                    livrosGrid.appendChild(card);
+                });
+            }
+
+            // Abrir modal
+            window.abrirModal = function (livroId) {
+                console.log('📖 Abrindo modal para livro:', livroId);
+                livroIdInput.value = livroId;
+                avaliacao = 0;
+                sliderAvaliacao.value = 0;
+                atualizarNota();
+                modal.style.display = "flex";
+            }
+
+            // Fechar modal
+            fecharModal.addEventListener("click", () => {
+                modal.style.display = "none";
+                avaliacao = 0;
+                sliderAvaliacao.value = 0;
+                atualizarNota();
+                formLeitura.reset();
+            });
+
+            // Slider de avaliação
+            sliderAvaliacao.addEventListener("input", () => {
+                avaliacao = parseFloat(sliderAvaliacao.value);
+                atualizarNota();
+            });
+
+            function atualizarNota() {
+                notaSelecionada.textContent = `Nota: ${avaliacao}/10`;
+            }
+
+            // Submeter formulário
+            formLeitura.addEventListener("submit", async (e) => {
+                e.preventDefault();
+
+                const data = {
+                    status: document.getElementById("status").value,
+                    avaliacao: avaliacao,
+                    comentario: document.getElementById("comentario").value || null,
+                    data_leitura: document.getElementById("data_leitura").value
+                };
+
+                console.log('💾 Dados para enviar:', data);
+
+                const payload = JSON.parse(atob(token.split(".")[1]));
+                const usuario_id = payload.id;
+                const livro_id = livroIdInput.value;
+
+                console.log('👤 User ID:', usuario_id);
+                console.log('📕 Livro ID:', livro_id);
+
+                try {
+                    const resp = await fetch(`/leituras/${usuario_id}/${livro_id}`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
+                        },
+                        body: JSON.stringify(data)
+                    });
+
+                    console.log('📡 Status da resposta:', resp.status);
+
+                    if (resp.ok) {
+                        const resultado = await resp.json();
+                        console.log('✅ Leitura registrada:', resultado);
+                        alert("Leitura registrada com sucesso!");
+                        modal.style.display = "none";
+                        formLeitura.reset();
+                        avaliacao = 0;
+                        sliderAvaliacao.value = 0;
+                        atualizarNota();
+                    } else {
+                        const erro = await resp.json();
+                        console.error('❌ Erro:', erro);
+                        alert("Erro: " + (erro.erro || "Falha ao registrar leitura"));
+                    }
+                } catch (erro) {
+                    console.error('❌ Erro completo:', erro);
+                    alert("Erro ao registrar leitura: " + erro.message);
+                }
+            });
+
+            // Carrega os livros inicialmente
+            carregarLivros();
+        }
+    </script>
+    </body>
 
 </html>

@@ -1,99 +1,349 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 
 <head>
     <meta charset="UTF-8">
-    <title>Gerenciar Livros</title>
+    <title>Gerenciar catálogo de livros</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+    <style>
+        .crud-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .section h2 {
+            color: #4a90e2;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #4a90e2;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .form-buttons button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .btn-submit {
+            background: #4a90e2;
+            color: white;
+        }
+
+        .btn-submit:hover {
+            background: #357abd;
+        }
+
+        .btn-limpar {
+            background: #ddd;
+            color: #333;
+        }
+
+        .btn-limpar:hover {
+            background: #bbb;
+        }
+
+        .livros-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .livros-table thead {
+            background: #f5f5f5;
+        }
+
+        .livros-table th,
+        .livros-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .livros-table th {
+            font-weight: bold;
+            color: #4a90e2;
+        }
+
+        .livros-table img {
+            width: 50px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 3px;
+        }
+
+        .acoes {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-editar,
+        .btn-excluir {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .btn-editar {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-editar:hover {
+            background: #229954;
+        }
+
+        .btn-excluir {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-excluir:hover {
+            background: #c0392b;
+        }
+
+        .busca-container {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .busca-container input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .busca-container button {
+            padding: 10px 20px;
+            background: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .mensagem {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .mensagem.sucesso {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .mensagem.erro {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .fechar {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .fechar:hover {
+            color: #000;
+        }
+    </style>
 </head>
 
 <body>
+    <!-- Cabeçalho -->
     <header>
         <div id="logo">
-            <img src="static\images\default.png" alt="Logo da Biblioteca"> <!-- Substitua por seu logo -->
+            <img src="static/images/logo.png" alt="Logo da Biblioteca">
         </div>
         <nav>
             <a href="/home_page_usuarios">Início</a>
-            <a href="minhas_leituras">Registo Leitura</a>
-            <a href="#">Sobre Nós</a>
-
+            <a href="/minhas_leituras">Adicionar leituras</a>
+            <a href="/perfil">Perfil</a>
         </nav>
     </header>
-    <main>
-        <h1>Gerenciamento de Livros</h1>
 
-        <section>
-            <h2>Cadastrar novo livro</h2>
-            <form id="formLivro">
-                <label>Título:</label>
-                <input type="text" name="titulo" required>
+    <main class="crud-container">
+        <h1>Gerenciar o Acervo de livros</h1>
+        <p style="color: #666; margin-bottom: 30px;">Adicione, edite ou remova livros do catálogo. Esses livros estarão disponíveis para todos os usuários.</p>
 
-                <label>Autor:</label>
-                <input type="text" name="autor" required>
+        <!-- Mensagens -->
+        <div id="mensagem" class="mensagem"></div>
 
-                <label>Gênero:</label>
-                <input type="text" name="genero" required>
-
-                <label>Ano de Publicação:</label>
-                <input type="number" name="ano_publicacao" required>
-
-                <label>URL da Imagem:</label><br>
-                <input type="text" name="imagem">
-
-                <button type="submit">Cadastrar</button>
+        <!-- SEÇÃO 1: Adicionar Novo Livro -->
+        <div class="section">
+            <h2>➕ Adicionar Novo Livro</h2>
+            <form id="formNovoLivro">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>Título: *</label>
+                        <input type="text" name="titulo" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Autor: *</label>
+                        <input type="text" name="autor" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Gênero: *</label>
+                        <input type="text" name="genero" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Ano de Publicação: *</label>
+                        <input type="number" name="ano_publicacao" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>URL da Imagem:</label>
+                    <input type="text" name="imagem" placeholder="https://exemplo.com/imagem.jpg">
+                </div>
+                <div class="form-buttons">
+                    <button type="submit" class="btn-submit">✅ Adicionar Livro</button>
+                    <button type="reset" class="btn-limpar">🗑️ Limpar Formulário</button>
+                </div>
             </form>
-        </section>
+        </div>
 
+        <!-- SEÇÃO 2: Lista de Livros -->
+        <div class="section">
+            <h2>📖 Todos os Livros do Catálogo</h2>
+
+            <div class="busca-container">
+                <input type="text" id="busca" placeholder="Buscar por título, autor ou gênero...">
+                <button id="btnBuscar">🔍 Buscar</button>
+                <button id="btnAtualizar">🔄 Atualizar</button>
+            </div>
+
+            <table class="livros-table">
+                <thead>
+                    <tr>
+                        <th>Imagem</th>
+                        <th>Título</th>
+                        <th>Autor</th>
+                        <th>Gênero</th>
+                        <th>Ano</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaLivros">
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: #999;">Carregando livros...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </main>
-    <hr>
 
-    <section>
-        <h2>Lista de livros</h2>
-        <input type="text" id="busca" placeholder="Buscar por título, autor ou gênero...">
-        <button id="btnBuscar">Buscar</button>
-        <button id="btnAtualizar">Atualizar lista</button>
-
-        <table border="1" cellpadding="5" style="margin-top:10px;">
-            <thead>
-                <tr>
-                    <th>Título</th>
-                    <th>Autor</th>
-                    <th>Gênero</th>
-                    <th>Ano</th>
-                    <th>Imagem</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody id="tabelaLivros"></tbody>
-        </table>
-    </section>
-
-    <p id="mensagem"></p>
-
-    <!-- Modal de Edição de Livro -->
+    <!-- Modal de Edição -->
     <div id="modalEditar" class="modal">
         <div class="modal-content">
-            <span id="fecharModal" class="fechar">&times;</span>
-            <h2>Editar Livro</h2>
+            <span class="fechar" id="fecharModal">&times;</span>
+            <h2>✏️ Editar Livro</h2>
             <form id="formEditar">
                 <input type="hidden" id="editarId">
 
-                <label>Título:</label><br>
-                <input type="text" id="editarTitulo" required><br><br>
+                <div class="form-group">
+                    <label>Título:</label>
+                    <input type="text" id="editarTitulo" required>
+                </div>
 
-                <label>Autor:</label><br>
-                <input type="text" id="editarAutor" required><br><br>
+                <div class="form-group">
+                    <label>Autor:</label>
+                    <input type="text" id="editarAutor" required>
+                </div>
 
-                <label>Gênero:</label><br>
-                <input type="text" id="editarGenero" required><br><br>
+                <div class="form-group">
+                    <label>Gênero:</label>
+                    <input type="text" id="editarGenero" required>
+                </div>
 
-                <label>Ano de Publicação:</label><br>
-                <input type="number" id="editarAno" required><br><br>
+                <div class="form-group">
+                    <label>Ano de Publicação:</label>
+                    <input type="number" id="editarAno" required>
+                </div>
 
-                <label>URL da Imagem:</label><br>
-                <input type="text" id="editarImagem"><br><br>
+                <div class="form-group">
+                    <label>URL da Imagem:</label>
+                    <input type="text" id="editarImagem">
+                </div>
 
-                <button type="submit">Salvar Alterações</button>
+                <div class="form-buttons">
+                    <button type="submit" class="btn-submit">💾 Salvar Alterações</button>
+                </div>
             </form>
         </div>
     </div>
@@ -102,17 +352,15 @@
     <footer>
         <div class="footer-container">
             <div class="footer-section sobre">
-                <h3>📚 Biblioteca Sugestões</h3>
-                <p>Uma plataforma para registrar e descobrir novas leituras. Explore, avalie os seus livros favoritos!
-                </p>
+                <h3>Acervo</h3>
+                <p>Uma plataforma para registrar e descobrir novas leituras. Explore, avalie e descubra os seus livros favoritos!</p>
             </div>
 
             <div class="footer-section links">
-                <h4>Links Rápidos</h4>
+                <h4>Links rápidos</h4>
                 <ul>
                     <li><a href="/home_page_usuarios">Início</a></li>
-                    <li><a href="/livros">Livros do banco (somente visual)</a></li>
-                    <li><a href="/usuarios">Usuarios do banco (somente visual)</a></li>
+                    <li><a href="/livros">Livros</a></li>
                 </ul>
             </div>
 
@@ -126,11 +374,11 @@
                 </div>
             </div>
         </div>
+
         <div class="footer-bottom">
-            <p>&copy; 2025 Biblioteca Sugestões — Todos os direitos reservados.</p>
+            <p>&copy; 2025 Projeto Acervo — Todos os direitos reservados.</p>
         </div>
     </footer>
-
 
     <script src="{{ url_for('static', filename='js/gerenciar_livros.js') }}"></script>
 </body>
