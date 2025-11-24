@@ -1,151 +1,43 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acervo - Página inicial</title>
+    <title>Biblioteca Sugestões</title>
     <link rel="stylesheet" href="../static/css/home.css">
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
-    <style>
-        .recomendacoes-container {
-            margin: 40px auto;
-            max-width: 1200px;
-        }
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/default.png') }}">
+    <!-- logo na aba /\-->
 
-        .loading {
-            text-align: center;
-            padding: 40px;
-            font-size: 1.2em;
-            color: #4a90e2;
-        }
-
-        .recomendacoes-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
-        }
-
-        .livro-recomendado {
-            background: white;
-            border-radius: 12px;
-            padding: 15px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            text-align: center;
-        }
-
-        .livro-recomendado:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .livro-recomendado img {
-            width: 100%;
-            height: 250px;
-            object-fit: cover;
-            border-radius: 8px;
-            margin-bottom: 12px;
-        }
-
-        .livro-recomendado h3 {
-            font-size: 1.1em;
-            color: #333;
-            margin: 10px 0;
-            min-height: 50px;
-        }
-
-        .livro-recomendado p {
-            color: #666;
-            font-size: 0.9em;
-            margin: 5px 0;
-        }
-
-        .genero-badge {
-            display: inline-block;
-            background: #4a90e2;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 15px;
-            font-size: 0.85em;
-            margin-top: 8px;
-        }
-
-        .erro-mensagem {
-            background: #fff3cd;
-            border: 1px solid #ffc107;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .sem-recomendacoes {
-            text-align: center;
-            padding: 60px 20px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .sem-recomendacoes h3 {
-            color: #4a90e2;
-            margin-bottom: 15px;
-        }
-
-        .sem-recomendacoes p {
-            color: #666;
-            margin-bottom: 20px;
-        }
-
-        .cta-button {
-            display: inline-block;
-            background: #4a90e2;
-            color: white;
-            padding: 12px 30px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: background 0.3s ease;
-        }
-
-        .cta-button:hover {
-            background: #357abd;
-        }
-    </style>
 </head>
 
 <body>
     <!-- Cabeçalho -->
     <header>
         <div id="logo">
-            <img src="static/images/logo.png" alt="Logo da Biblioteca">
+            <img src="static\images\default.png" alt="Logo da Biblioteca"> <!-- Substitua por seu logo -->
         </div>
         <nav>
-            <a href="minhas_leituras">Adicionar leituras</a>
-            <a href="crudes_livros">Cadastro de livros</a>
-            <a href="perfil">Perfil</a>
+            <a href="minhas_leituras">Registo de Leitura</a>
+            <a href="crudes_livros">Registro de Livros</a>
+
         </nav>
     </header>
 
     <!-- Corpo -->
     <main class="fade-in">
-        <h1>Bem-vindo ao seu Acervo!</h1>
-        <p>A sua plataforma personalizada para descoberta de novos livros com base naquilo que você já leu.</p>
-
-        <!-- Container de Recomendações -->
-        <section id="recomendacoes-section" class="recomendacoes-container">
-            <h2 style="color: #4a90e2; margin-bottom: 20px;">Recomendações personalizadas para você:</h2>
-
-            <div id="loading" class="loading">
-                <p>Buscando recomendações baseadas no seu perfil...</p>
-            </div>
-
-            <div id="erro-container" style="display: none;"></div>
-            <div id="recomendacoes-grid" class="recomendacoes-grid"></div>
-            <div id="sem-recomendacoes" class="sem-recomendacoes" style="display: none;"></div>
+        <h1>Bem-vindo ao seu Acervo</h1>
+        <p>Descubra novos livros baseados no que você já leu! Faça login ou registre-se para ver recomendações
+            personalizadas.</p>
+        <section id="sugestoes">
+            <h2>Sugestões do Dia</h2>
+            <p>Clique no botão abaixo para ver sugestões baseadas em seus livros lidos.</p>
+            <button id="toggle-sugestoes">Mostrar Sugestões</button>
+            <ul id="lista-sugestoes">
+                <li>Se você gostou de "1984" de George Orwell, recomendamos "Fahrenheit 451" de Ray Bradbury.</li>
+                <li>Para fãs de ficção científica, experimente "Dune" de Frank Herbert.</li>
+                <li>Baseado em romances clássicos, leia "Orgulho e Preconceito" de Jane Austen.</li>
+            </ul>
         </section>
     </main>
 
@@ -153,12 +45,13 @@
     <footer>
         <div class="footer-container">
             <div class="footer-section sobre">
-                <h3>Acervo</h3>
-                <p>Uma plataforma para registrar e descobrir novas leituras. Explore, avalie e descubra os seus livros favoritos!</p>
+                <h3>📚 Biblioteca Sugestões</h3>
+                <p>Uma plataforma para registrar e descobrir novas leituras. Explore, avalie os seus livros favoritos!
+                </p>
             </div>
 
             <div class="footer-section links">
-                <h4>Links rápidos</h4>
+                <h4>Links Rápidos</h4>
                 <ul>
                     <li><a href="/home_page_usuarios">Início</a></li>
                     <li><a href="/livros">Livros</a></li>
@@ -177,117 +70,28 @@
         </div>
 
         <div class="footer-bottom">
-            <p>&copy; 2025 Projeto Acervo — Todos os direitos reservados.</p>
-        </div>
-    </footer>
 
-    <!-- JavaScript -->
-    <script>
-        document.addEventListener('DOMContentLoaded', async function () {
-            // Animação fade-in
-            document.body.classList.add('fade-in');
-
-            // Buscar recomendações
-            await carregarRecomendacoes();
-        });
-
-        async function carregarRecomendacoes() {
-            const loading = document.getElementById('loading');
-            const erroContainer = document.getElementById('erro-container');
-            const recomendacoesGrid = document.getElementById('recomendacoes-grid');
-            const semRecomendacoes = document.getElementById('sem-recomendacoes');
-
-            try {
-                // Pegar token do localStorage
-                const token = localStorage.getItem('token');
-
-                if (!token) {
-                    mostrarErro('Você precisa estar logado para ver recomendações.');
-                    setTimeout(() => window.location.href = '/login_usuario', 2000);
-                    return;
-                }
-
-                // Decodificar token para pegar user_id
-                const payload = JSON.parse(atob(token.split('.')[1]));
-                const userId = payload.id;
-                console.log('🔍 Buscando recomendações para:', userId);
-
-                // Buscar recomendações do backend
-                const response = await fetch(`/recomendacoes/${userId}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+            <!-- JavaScript -->
+            <script>
+                // Animação de fade-in na página
+                document.addEventListener('DOMContentLoaded', function () {
+                    document.body.classList.add('fade-in');
                 });
 
-                console.log('📡 Status da resposta:', response.status);
-                loading.style.display = 'none';
+                // Toggle para mostrar/ocultar sugestões
+                const toggleButton = document.getElementById('toggle-sugestoes');
+                const listaSugestoes = document.getElementById('lista-sugestoes');
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    console.error('❌ Erro na resposta:', errorData);
-                    throw new Error('Erro ao buscar recomendações');
-                }
-
-                const data = await response.json();
-                console.log('📊 Dados recebidos:', data);
-
-                if (!data.recomendacoes || data.recomendacoes.length === 0) {
-                    console.log('⚠️ Nenhuma recomendação disponível');
-                    mostrarSemRecomendacoes();
-                    return;
-                }
-
-                console.log('✅ Renderizando', data.recomendacoes.length, 'recomendações');
-                // Renderizar recomendações
-                renderizarRecomendacoes(data.recomendacoes);
-
-            } catch (erro) {
-                console.error('Erro:', erro);
-                loading.style.display = 'none';
-                mostrarErro('Não foi possível carregar as recomendações. Tente novamente mais tarde.');
-            }
-        }
-
-        function renderizarRecomendacoes(livros) {
-            const grid = document.getElementById('recomendacoes-grid');
-            grid.innerHTML = '';
-
-            livros.forEach(livro => {
-                const card = document.createElement('div');
-                card.className = 'livro-recomendado';
-
-                const imagemUrl = livro.imagem_url || '/static/images/default.png';
-
-                card.innerHTML = `
-                    <img src="${imagemUrl}" alt="${livro.titulo}"
-                         onerror="this.src='/static/images/default.png'">
-                    <h3>${livro.titulo}</h3>
-                    <p><strong>${livro.autor}</strong></p>
-                    <p>${livro.ano_publicacao}</p>
-                    <span class="genero-badge">${livro.genero}</span>
-                `;
-
-                grid.appendChild(card);
-            });
-        }
-
-        function mostrarSemRecomendacoes() {
-            const container = document.getElementById('sem-recomendacoes');
-            container.style.display = 'block';
-            container.innerHTML = `
-                <h3>🎯 Ainda não temos recomendações para você</h3>
-                <p>Avalie alguns livros primeiro para receber recomendações personalizadas!</p>
-                <a href="/minhas_leituras" class="cta-button">Avaliar Livros</a>
-            `;
-        }
-
-        function mostrarErro(mensagem) {
-            const container = document.getElementById('erro-container');
-            container.style.display = 'block';
-            container.className = 'erro-mensagem';
-            container.innerHTML = `<p>⚠️ ${mensagem}</p>`;
-        }
-    </script>
+                toggleButton.addEventListener('click', function () {
+                    if (listaSugestoes.style.display === 'none' || listaSugestoes.style.display === '') {
+                        listaSugestoes.style.display = 'block';
+                        toggleButton.textContent = 'Ocultar Sugestões';
+                    } else {
+                        listaSugestoes.style.display = 'none';
+                        toggleButton.textContent = 'Mostrar Sugestões';
+                    }
+                });
+            </script>
 </body>
 
 </html>
