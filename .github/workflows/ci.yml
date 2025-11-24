@@ -99,4 +99,4 @@ jobs:
       - name: Deploy para Railway
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: railway up --service energetic-fulfillment --environment production
+        run: railway up --service ProjetoAcervo --environment production
