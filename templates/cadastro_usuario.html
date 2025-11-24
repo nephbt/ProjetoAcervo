@@ -1,88 +1,34 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de Usuário</title>
-    <link rel="stylesheet" href="../static/css/home.css">
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/default.png') }}">
 </head>
 
 <body>
-    <header>
-        <div id="logo">
-            <img src="static/images/default.png" alt="Logo da Biblioteca">
-        </div>
-        <nav>
-            <a href="/">Início</a>
-            <a href="/login_usuario">Login</a>
-            <a href="#">Sobre nós</a>
-        </nav>
-    </header>
+    <h1>Cadastro de usuários</h1>
 
-    <main class="fade-in centralizado">
-        <h1>Cadastro de Usuários</h1>
+    <form id="formUsuario" method="post">
+        <label>Nome:</label><br>
+        <input type="text" name="nome" required><br><br>
 
-        <form id="formUsuario" method="post">
-            <label>Nome:</label>
-            <input type="text" name="nome" required>
+        <label>Email:</label><br>
+        <input type="email" name="email" required><br><br>
 
-            <label>Email:</label>
-            <input type="email" name="email" required>
+        <label>Senha:</label><br>
+        <input type="password" name="senha" required><br><br>
 
-            <label>Senha:</label>
-            <input type="password" name="senha" required>
+        <label>Data de Nascimento:</label><br>
+        <input type="date" name="data_nasc" required><br><br>
 
-            <label>Data de Nascimento:</label>
-            <input type="date" name="data_nasc" required>
+        <button type="submit">Cadastrar</button>
+    </form>
 
-            <button type="submit">Cadastrar</button>
-        </form>
+    <p id="mensagem"></p>
 
-        <p id="mensagem"></p>
-
-        <div class="link-voltar">
-            <a href="/">← Voltar para o início</a>
-        </div>
-    </main>
-
-    <!-- Rodapé -->
-    <footer>
-        <div class="footer-container">
-            <div class="footer-section sobre">
-                <h3>Biblioteca Sugestões</h3>
-                <p>Uma plataforma para registrar e descobrir novas leituras. Explore, avalie os seus livros favoritos!
-                </p>
-            </div>
-
-            <div class="footer-section links">
-                <h4>Links Rápidos</h4>
-                <ul>
-                    <li><a href="/">Início</a></li>
-                    <li><a href="/livros">Livros</a></li>
-                    <li><a href="/login_usuario">Login</a></li>
-                    <li><a href="/cadastro_usuario">Cadastro</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-section contato">
-                <h4>Contato</h4>
-                <p>📧 projetoacervo@gmail.com</p>
-                <p>📞 (62) 98567-9987</p>
-                <div class="social">
-                    <a href="#"><img src="/static/images/facebook.png" alt="Facebook"></a>
-                    <a href="#"><img src="/static/images/instagram.png" alt="Instagram"></a>
-                </div>
-            </div>
-        </div>
-
-        <div class="footer-bottom">
-            <p>&copy; 2025 Biblioteca Sugestões — Todos os direitos reservados.</p>
-        </div>
-    </footer>
-
-    <!-- JavaScript -->
+    <!-- Importando o JS externo -->
     <script src="{{ url_for('static', filename='js/cadastro_usuario.js') }}"></script>
 </body>
 
