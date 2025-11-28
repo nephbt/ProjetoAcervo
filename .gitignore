@@ -4,6 +4,7 @@ __pycache__/
 # Virtualenv
 .venv/
 venv/
+.env
 
 # Executáveis e builds locais
 projeto_acervo

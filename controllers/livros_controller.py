@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from database import bd
+from dbpostgres import bd
 import uuid
 from controllers.auth_utils import verificar_livro
 
