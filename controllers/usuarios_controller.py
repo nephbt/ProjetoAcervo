@@ -75,5 +75,5 @@ def retornarUsuario():
 # -------------------------------------
 @usuariosRoute.route("/perfil", methods=["GET"])
 @requerir_token
-def perfil(id_usuario):
-    return jsonify({"mensagem": f"Bem-vindo usuário {id_usuario}!"}), 200
+def perfil(usuario_id):
+    return jsonify({"mensagem": f"Bem-vindo usuário {usuario_id}!"}), 200
