@@ -96,5 +96,5 @@ jobs:
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: |
-          railway up --service ProjetoAcervo --yes
+          railway up --service ProjetoAcervo -- --yes
   
