@@ -11,6 +11,25 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: acervo_user
+          POSTGRES_PASSWORD: acervo_pass
+          POSTGRES_DB: acervo_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U acervo_user -d acervo_db"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      DATABASE_URL: postgresql://acervo_user:acervo_pass@localhost:5432/acervo_db
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,13 +44,16 @@ jobs:
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
 
       - name: Instalar dependências
         run: |
-          python -m pip install --upgrade pip
+          pip install --upgrade pip
           pip install -r requirements.txt
+
+      - name: Criar estrutura do banco
+        run: |
+          apt-get update && apt-get install -y postgresql-client
+          psql $DATABASE_URL -f db/init.sql
 
       - name: Lint
         run: |
@@ -46,12 +68,11 @@ jobs:
           FLASK_ENV: testing
           PYTHONPATH: .
         run: |
-          pip install coverage
-          coverage run -m pytest -v --disable-warnings --maxfail=1
-          coverage report
+          pip install coverage pytest
+          coverage run -m pytest -v
           coverage xml -o reports/coverage.xml
 
-      - name: Salvar relatório de teste
+      - name: Salvar relatório
         uses: actions/upload-artifact@v4
         with:
           name: pytest-report
@@ -76,10 +97,22 @@ jobs:
           curl -fsSL https://railway.app/install.sh | sh
           echo "$HOME/.railway/bin" >> $GITHUB_PATH
 
+      - name: Login no Railway
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: railway login --token "$RAILWAY_TOKEN"
+
+      - name: Criar tabelas no Postgres da Railway
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          DATABASE_URL: ${{ secrets.RAILWAY_DATABASE_URL }}
+        run: |
+          railway run --service ProjetoAcervo "psql \"${DATABASE_URL}\" -f db/init.sql"
+
+
       - name: Deploy para Railway
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: |
-          railway up \
-            --service ProjetoAcervo \
-            --environment production
+          railway up --service ProjetoAcervo --yes
+  
