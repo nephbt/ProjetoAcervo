@@ -9,7 +9,14 @@ from models import Livro, Usuario, Leitura
 
 
 def get_connection():
-    return psycopg2.connect(os.environ["DATABASE_URL"], sslmode="require")
+    url = os.environ["DATABASE_URL"]
+
+    # Railway sempre precisa de SSL
+    if "railway" in url or "internal" in url:
+        return psycopg2.connect(url, sslmode="require")
+
+    # Local (GitHub Actions, sua máquina): sem SSL
+    return psycopg2.connect(url, sslmode="disable")
 
 
 def criar_tabelas():
