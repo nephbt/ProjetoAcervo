@@ -50,11 +50,6 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Criar estrutura do banco
-        run: |
-          apt-get update && apt-get install -y postgresql-client
-          psql $DATABASE_URL -f db/init.sql
-
       - name: Lint
         run: |
           pip install flake8
@@ -101,14 +96,6 @@ jobs:
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: railway login --token "$RAILWAY_TOKEN"
-
-      - name: Criar tabelas no Postgres da Railway
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          DATABASE_URL: ${{ secrets.RAILWAY_DATABASE_URL }}
-        run: |
-          railway run --service ProjetoAcervo "psql \"${DATABASE_URL}\" -f db/init.sql"
-
 
       - name: Deploy para Railway
         env:
