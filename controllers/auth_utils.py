@@ -52,9 +52,7 @@ def verificar_usuario(f):
     @wraps(f)
     def decorator(*args, **kwargs):
         usuario_id = kwargs.get("usuario_id")
-
-        # Agora a busca vem do Postgres
-        usuario = bd.buscarUsuarioPorId(usuario_id)
+        usuario = bd.usuarios.get(usuario_id)
 
         if not usuario:
             return jsonify({"Erro": "Usuário não encontrado"}), 404
