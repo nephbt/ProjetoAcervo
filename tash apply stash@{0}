@@ -1,0 +1,523 @@
+[1mdiff --git a/controllers/auth_utils.py b/controllers/auth_utils.py[m
+[1mindex 938ebad..df8c757 100644[m
+[1m--- a/controllers/auth_utils.py[m
+[1m+++ b/controllers/auth_utils.py[m
+[36m@@ -2,15 +2,12 @@[m [mfrom flask import jsonify, request[m
+ from functools import wraps[m
+ import jwt[m
+ import datetime[m
+[31m-from dbpostgres import bd  # AGORA usa o Postgres[m
+[31m-# bd é sua instância de DatabasePostgres()[m
+[32m+[m[32mfrom dbpostgres import bd[m
+[32m+[m[32mfrom dbpostgres import get_connection[m
+ [m
+ key = "chave_bem_secreta"[m
+ [m
+ [m
+[31m-# ----------------------------[m
+[31m-# Gerar Token[m
+[31m-# ----------------------------[m
+ def gerar_token(usuario_id):[m
+     payload = {[m
+         "id": usuario_id,[m
+[36m@@ -20,9 +17,6 @@[m [mdef gerar_token(usuario_id):[m
+     return token[m
+ [m
+ [m
+[31m-# ----------------------------[m
+[31m-# Exigir token nas rotas[m
+[31m-# ----------------------------[m
+ def requerir_token(f):[m
+     @wraps(f)[m
+     def decorator(*args, **kwargs):[m
+[36m@@ -45,37 +39,48 @@[m [mdef requerir_token(f):[m
+     return decorator[m
+ [m
+ [m
+[31m-# ----------------------------[m
+[31m-# Verificar existência do usuário[m
+[31m-# ----------------------------[m
+[32m+[m[32m# -----------------------------------------------------------------[m
+[32m+[m[32m# Consulta o PostgreSQL[m
+[32m+[m[32m# -----------------------------------------------------------------[m
+ def verificar_usuario(f):[m
+     @wraps(f)[m
+     def decorator(*args, **kwargs):[m
+         usuario_id = kwargs.get("usuario_id")[m
+[31m-        usuario = bd.usuarios.get(usuario_id)[m
+ [m
+[31m-        if not usuario:[m
+[32m+[m[32m        conn = get_connection()[m
+[32m+[m[32m        cursor = conn.cursor()[m
+[32m+[m
+[32m+[m[32m        cursor.execute([m
+[32m+[m[32m            "SELECT id, nome, email, senha, data_nasc FROM usuarios WHERE id = %s",[m
+[32m+[m[32m            (usuario_id,)[m
+[32m+[m[32m        )[m
+[32m+[m
+[32m+[m[32m        row = cursor.fetchone()[m
+[32m+[m[32m        cursor.close()[m
+[32m+[m[32m        conn.close()[m
+[32m+[m
+[32m+[m[32m        if not row:[m
+             return jsonify({"Erro": "Usuário não encontrado"}), 404[m
+[32m+[m[41m        [m
+[32m+[m[32m        usuario = {[m
+[32m+[m[32m            "id": row[0],[m
+[32m+[m[32m            "nome": row[1],[m
+[32m+[m[32m            "email": row[2],[m
+[32m+[m[32m            "senha": row[3],[m
+[32m+[m[32m            "data_nasc": row[4][m
+[32m+[m[32m        }[m
+ [m
+         return f(usuario=usuario, *args, **kwargs)[m
+ [m
+     return decorator[m
+ [m
+ [m
+[31m-# ----------------------------[m
+[31m-# Verificar existência do livro[m
+[31m-# ----------------------------[m
+ def verificar_livro(f):[m
+     @wraps(f)[m
+     def decorator(*args, **kwargs):[m
+         livro_id = kwargs.get("livro_id")[m
+ [m
+[31m-        # Primeiro tenta cache (se existir)[m
+[31m-        livro = bd.livros.get(livro_id) if hasattr(bd, "livros") else None[m
+[31m-[m
+[31m-        # Se não estiver no cache, busca no Postgres[m
+[31m-        if not livro:[m
+[31m-            livro = bd.buscarLivroPorId(livro_id)[m
+[32m+[m[32m        livro = bd.buscarLivroPorId(livro_id)[m
+ [m
+         if not livro:[m
+             return jsonify({"Erro": "Livro não encontrado"}), 404[m
+[1mdiff --git a/controllers/leituras_controller.py b/controllers/leituras_controller.py[m
+[1mindex 76bf867..d66a2ee 100644[m
+[1m--- a/controllers/leituras_controller.py[m
+[1m+++ b/controllers/leituras_controller.py[m
+[36m@@ -2,6 +2,7 @@[m [mfrom flask import Blueprint, jsonify, request[m
+ from dbpostgres import bd[m
+ from controllers.auth_utils import verificar_usuario, verificar_livro, requerir_token[m
+ [m
+[32m+[m
+ leiturasRoute = Blueprint("leituras", __name__, url_prefix="/leituras")[m
+ [m
+ [m
+[36m@@ -9,9 +10,8 @@[m [mleiturasRoute = Blueprint("leituras", __name__, url_prefix="/leituras")[m
+ # POST /leituras/<usuario_id>/<livro_id>[m
+ # ------------------------------------------------[m
+ @leiturasRoute.route("/<usuario_id>/<livro_id>", methods=["POST"])[m
+[31m-@verificar_usuario[m
+[31m-@verificar_livro[m
+[31m-def registrarLeitura(usuario_id, livro_id, usuario, livro):[m
+[32m+[m[32mdef registrarLeitura(usuario_id, livro_id):[m
+[32m+[m[41m    [m
+     data = request.get_json()[m
+ [m
+     status = data.get("status")[m
+[36m@@ -22,23 +22,22 @@[m [mdef registrarLeitura(usuario_id, livro_id, usuario, livro):[m
+     if not status or not data_leitura:[m
+         return jsonify({"erro": "Campos obrigatórios faltando"}), 400[m
+ [m
+[31m-    leitura = bd.cadastrarLeitura([m
+[31m-        usuario.id,[m
+[31m-        livro.id,[m
+[31m-        status,[m
+[31m-        avaliacao,[m
+[31m-        data_leitura,[m
+[31m-        comentario,[m
+[31m-    )[m
+[32m+[m[32m    try:[m
+[32m+[m[32m        # Agora passamos os IDs diretamente[m
+[32m+[m[32m        leitura = bd.cadastrarLeitura([m
+[32m+[m[32m            idUsuario=usuario_id,[m
+[32m+[m[32m            idLivro=livro_id,[m
+[32m+[m[32m            status=status,[m
+[32m+[m[32m            avaliacao=avaliacao,[m
+[32m+[m[32m            dataLeitura=data_leitura,[m
+[32m+[m[32m            comentario=comentario[m
+[32m+[m[32m        )[m
+[32m+[m
+[32m+[m[32m    except Exception as e:[m
+[32m+[m[32m        print("Erro ao cadastrar leitura:", e)[m
+[32m+[m[32m        return jsonify({"erro": "Falha ao cadastrar leitura"}), 500[m
+ [m
+[31m-    return jsonify({[m
+[31m-        "id_usuario": leitura.id_usuario,[m
+[31m-        "id_livro": leitura.id_livro,[m
+[31m-        "status": leitura.status,[m
+[31m-        "avaliacao": leitura.avaliacao,[m
+[31m-        "data_leitura": leitura.dataLeitura,[m
+[31m-        "comentario": leitura.comentario,[m
+[31m-    }), 201[m
+[32m+[m[32m    return jsonify(leitura.to_dict()), 201[m
+ [m
+ [m
+ # ------------------------------------------------[m
+[36m@@ -51,9 +50,9 @@[m [mdef carregarLeiturasUsuario(usuario_id, usuario):[m
+     leituras = bd.carregarLeituras(usuario_id)[m
+ [m
+     if not leituras:[m
+[31m-        return jsonify({"Erro": "Nenhuma leitura encontrada"}), 404[m
+[32m+[m[32m        return jsonify({"erro": "Nenhuma leitura encontrada"}), 404[m
+ [m
+[31m-    return jsonify([l.__dict__ for l in leituras]), 200[m
+[32m+[m[32m    return jsonify([l.to_dict() for l in leituras]), 200[m
+ [m
+ [m
+ # ------------------------------------------------[m
+[36m@@ -74,7 +73,10 @@[m [mdef editarLeitura(usuario_id, livro_id, usuario, livro):[m
+         data.get("comentario"),[m
+     )[m
+ [m
+[31m-    return jsonify(leituraEditada.__dict__), 201[m
+[32m+[m[32m    if not leituraEditada:[m
+[32m+[m[32m        return jsonify({"erro": "Leitura não encontrada"}), 404[m
+[32m+[m
+[32m+[m[32m    return jsonify(leituraEditada.to_dict()), 200[m
+ [m
+ [m
+ # ------------------------------------------------[m
+[36m@@ -82,20 +84,9 @@[m [mdef editarLeitura(usuario_id, livro_id, usuario, livro):[m
+ # ------------------------------------------------[m
+ @leiturasRoute.route("/todas", methods=["GET"])[m
+ def listarTodasLeituras():[m
+[31m-    # Agora buscamos todas diretamente no Postgres[m
+     todas_leituras = bd.carregarTodasLeituras()[m
+ [m
+     if not todas_leituras:[m
+         return jsonify({"mensagem": "Nenhuma leitura encontrada"}), 404[m
+ [m
+[31m-    return jsonify([[m
+[31m-        {[m
+[31m-            "id_usuario": leitura.id_usuario,[m
+[31m-            "id_livro": leitura.id_livro,[m
+[31m-            "status": leitura.status,[m
+[31m-            "avaliacao": leitura.avaliacao,[m
+[31m-            "data_leitura": leitura.dataLeitura,[m
+[31m-            "comentario": leitura.comentario,[m
+[31m-        }[m
+[31m-        for leitura in todas_leituras[m
+[31m-    ]), 200[m
+[32m+[m[32m    return jsonify([l.to_dict() for l in todas_leituras]), 200[m
+[1mdiff --git a/controllers/livros_controller.py b/controllers/livros_controller.py[m
+[1mindex cc3bc94..81de4cf 100644[m
+[1m--- a/controllers/livros_controller.py[m
+[1m+++ b/controllers/livros_controller.py[m
+[36m@@ -5,14 +5,18 @@[m [mfrom controllers.auth_utils import verificar_livro[m
+ [m
+ livrosRoute = Blueprint("livros", __name__, url_prefix="/livros")[m
+ [m
+[31m-[m
+[31m-# -------------------------------------[m
+[31m-# POST /livros/  → uparLivro[m
+[31m-# -------------------------------------[m
+[32m+[m[32m# ------------------------------------------------------[m
+[32m+[m[32m# POST /livros/  → cadastrar livro[m
+[32m+[m[32m# ------------------------------------------------------[m
+ @livrosRoute.route("/", methods=["POST"])[m
+[31m-def uparLivro():[m
+[32m+[m[32mdef cadastrarLivro():[m
+     data = request.get_json() if request.is_json else request.form[m
+ [m
+[32m+[m[32m    campos_obrigatorios = ["titulo", "autor", "genero", "ano_publicacao"][m
+[32m+[m[32m    for campo in campos_obrigatorios:[m
+[32m+[m[32m        if campo not in data:[m
+[32m+[m[32m            return jsonify({"erro": f"Campo obrigatório faltando: {campo}"}), 400[m
+[32m+[m
+     novo_livro = bd.cadastrarLivro([m
+         str(uuid.uuid4()),[m
+         data["titulo"],[m
+[36m@@ -22,77 +26,53 @@[m [mdef uparLivro():[m
+         data.get("imagem")  # opcional[m
+     )[m
+ [m
+[31m-    return jsonify(novo_livro.__dict__), 201[m
+[31m-[m
+[31m-[m
+[31m-# -------------------------------------[m
+[31m-# POST /livros/cadastro → cadastrarLivro[m
+[31m-# -------------------------------------[m
+[31m-@livrosRoute.route("/cadastro", methods=["POST"])[m
+[31m-def cadastrarLivro():[m
+[31m-    data = request.form[m
+[31m-    imagem_url = data.get("imagem")[m
+[31m-    id = str(uuid.uuid4())  # ID único gerado pelo backend[m
+[31m-[m
+[31m-    novo_livro = bd.cadastrarLivro([m
+[31m-        id,[m
+[31m-        data["titulo"],[m
+[31m-        data["autor"],[m
+[31m-        data["genero"],[m
+[31m-        data["ano_publicacao"],[m
+[31m-        imagem_url,[m
+[31m-    )[m
+[31m-[m
+[31m-    return jsonify(novo_livro.__dict__), 201[m
+[32m+[m[32m    return jsonify(novo_livro.to_dict()), 201[m
+ [m
+ [m
+[31m-# -------------------------------------[m
+[31m-# GET /livros/<id> → retornarLivroId[m
+[31m-# -------------------------------------[m
+[32m+[m[32m# ------------------------------------------------------[m
+[32m+[m[32m# GET /livros/<id>[m
+[32m+[m[32m# ------------------------------------------------------[m
+ @livrosRoute.route("/<livro_id>", methods=["GET"])[m
+ @verificar_livro[m
+ def retornarLivroId(livro_id, livro):[m
+[31m-    return jsonify(livro.__dict__), 200[m
+[32m+[m[32m    return jsonify(livro.to_dict()), 200[m
+ [m
+ [m
+[31m-# -------------------------------------[m
+[31m-# GET /livros/ → retornarLivros[m
+[31m-# -------------------------------------[m
+[32m+[m[32m# ------------------------------------------------------[m
+[32m+[m[32m# GET /livros/[m
+[32m+[m[32m# ------------------------------------------------------[m
+ @livrosRoute.route("/", methods=["GET"])[m
+ def retornarLivros():[m
+     livros = bd.buscarTodosLivros()[m
+[31m-    return jsonify([livro.__dict__ for livro in livros]), 200[m
+[32m+[m[32m    return jsonify([livro.to_dict() for livro in livros]), 200[m
+ [m
+ [m
+[31m-# -------------------------------------[m
+[31m-# PUT /livros/<id> → editarLivro[m
+[31m-# -------------------------------------[m
+[32m+[m[32m# ------------------------------------------------------[m
+[32m+[m[32m# PUT /livros/<id>[m
+[32m+[m[32m# ------------------------------------------------------[m
+ @livrosRoute.route("/<livro_id>", methods=["PUT"])[m
+[31m-def editarLivro(livro_id):[m
+[32m+[m[32m@verificar_livro[m
+[32m+[m[32mdef editarLivro(livro_id, livro):[m
+     dados = request.get_json()[m
+ [m
+[31m-    livro_existente = bd.buscarLivroPorId(livro_id)[m
+[31m-    if not livro_existente:[m
+[31m-        return jsonify({"erro": "Livro não encontrado"}), 404[m
+[31m-[m
+     livro_atualizado = bd.editarLivro([m
+         livro_id,[m
+         dados.get("titulo"),[m
+         dados.get("autor"),[m
+         dados.get("genero"),[m
+         dados.get("ano_publicacao"),[m
+[31m-        dados.get("imagem_url")[m
+[32m+[m[32m        dados.get("imagem")[m
+     )[m
+ [m
+     return jsonify({[m
+         "mensagem": "Livro atualizado com sucesso!",[m
+[31m-        "livro": livro_atualizado.__dict__[m
+[32m+[m[32m        "livro": livro_atualizado.to_dict()[m
+     }), 200[m
+ [m
+ [m
+[31m-# -------------------------------------[m
+[31m-# DELETE /livros/<id> → excluirLivro[m
+[31m-# -------------------------------------[m
+[32m+[m[32m# ------------------------------------------------------[m
+[32m+[m[32m# DELETE /livros/<id>[m
+[32m+[m[32m# ------------------------------------------------------[m
+ @livrosRoute.route("/<livro_id>", methods=["DELETE"])[m
+ @verificar_livro[m
+ def excluirLivro(livro_id, livro):[m
+[1mdiff --git a/controllers/paginas_controller.py b/controllers/paginas_controller.py[m
+[1mindex 7253fad..d87c029 100644[m
+[1m--- a/controllers/paginas_controller.py[m
+[1m+++ b/controllers/paginas_controller.py[m
+[36m@@ -1,11 +1,10 @@[m
+ from flask import Blueprint, render_template, session, redirect, url_for, request, jsonify[m
+[31m-from dbpostgres import bd[m
+[32m+[m[32mfrom dbpostgres import get_connection  # importa a função correta[m
+ [m
+[31m-# Blueprint para páginas HTML[m
+ pagesRoute = Blueprint("pages", __name__)[m
+ [m
+ # ------------------------------------------------------------[m
+[31m-# Homepage (acessível sem login)[m
+[32m+[m[32m# Homepage[m
+ @pagesRoute.route("/", methods=["GET"])[m
+ def homepage():[m
+     return render_template("index.html")[m
+[36m@@ -19,10 +18,14 @@[m [mdef perfil_usuario():[m
+     if not usuario_id:[m
+         return redirect(url_for("pages.homepage"))[m
+ [m
+[31m-    cursor = bd.conn.cursor()[m
+[32m+[m[32m    conn = get_connection()[m
+[32m+[m[32m    cursor = conn.cursor()[m
+[32m+[m
+     cursor.execute("SELECT id, nome, email FROM usuarios WHERE id = %s", (usuario_id,))[m
+     usuario = cursor.fetchone()[m
+[32m+[m
+     cursor.close()[m
+[32m+[m[32m    conn.close()[m
+ [m
+     return render_template("perfil.html", usuario=usuario)[m
+ [m
+[36m@@ -34,40 +37,47 @@[m [mdef home_page():[m
+     if not usuario_id:[m
+         return redirect(url_for("pages.homepage"))[m
+ [m
+[31m-    cursor = bd.conn.cursor()[m
+[32m+[m[32m    conn = get_connection()[m
+[32m+[m[32m    cursor = conn.cursor()[m
+[32m+[m
+     cursor.execute("SELECT id, nome FROM usuarios WHERE id = %s", (usuario_id,))[m
+     usuario = cursor.fetchone()[m
+[32m+[m
+     cursor.close()[m
+[32m+[m[32m    conn.close()[m
+ [m
+     return render_template("home_page_usuarios.html", usuario=usuario)[m
+ [m
+ [m
+ # ------------------------------------------------------------[m
+[31m-# Página: Minhas leituras + pesquisa[m
+[32m+[m[32m# Página: Minhas leituras[m
+ @pagesRoute.route("/minhas_leituras")[m
+ def listar_livros():[m
+     usuario_id = session.get("usuario_id")[m
+     if not usuario_id:[m
+         return redirect(url_for("pages.homepage"))[m
+ [m
+[31m-    cursor = bd.conn.cursor()[m
+[32m+[m[32m    conn = get_connection()[m
+[32m+[m[32m    cursor = conn.cursor()[m
+     cursor.execute("SELECT id, titulo, autor, genero FROM livros")[m
+     livros = cursor.fetchall()[m
+     cursor.close()[m
+[32m+[m[32m    conn.close()[m
+ [m
+     return render_template("minhas_leituras.html", livros=livros, usuario_id=usuario_id)[m
+ [m
+ [m
+ # ------------------------------------------------------------[m
+[31m-# Endpoint ajax de pesquisa[m
+[32m+[m[32m# Ajax: Pesquisa de livros[m
+ @pagesRoute.route("/pesquisar_livros")[m
+ def pesquisar_livros():[m
+     query = request.args.get("q", "").strip().lower()[m
+[31m-[m
+     if not query:[m
+         return jsonify([])[m
+ [m
+[31m-    cursor = bd.conn.cursor()[m
+[32m+[m[32m    conn = get_connection()[m
+[32m+[m[32m    cursor = conn.cursor()[m
+[32m+[m
+     cursor.execute("""[m
+         SELECT id, titulo, autor, genero[m
+         FROM livros[m
+[36m@@ -77,7 +87,9 @@[m [mdef pesquisar_livros():[m
+     """, (f"%{query}%", f"%{query}%", f"%{query}%"))[m
+ [m
+     livros = cursor.fetchall()[m
+[32m+[m
+     cursor.close()[m
+[32m+[m[32m    conn.close()[m
+ [m
+     resultado = [[m
+         {"id": l[0], "titulo": l[1], "autor": l[2], "genero": l[3]}[m
+[36m@@ -95,9 +107,13 @@[m [mdef pagina_listar_livros():[m
+     if not usuario_id:[m
+         return redirect(url_for("pages.homepage"))[m
+ [m
+[31m-    cursor = bd.conn.cursor()[m
+[32m+[m[32m    conn = get_connection()[m
+[32m+[m[32m    cursor = conn.cursor()[m
+[32m+[m
+     cursor.execute("SELECT id, titulo, autor, genero FROM livros")[m
+     livros = cursor.fetchall()[m
+[32m+[m
+     cursor.close()[m
+[32m+[m[32m    conn.close()[m
+ [m
+     return render_template("gerenciar_livros.html", livros=livros, usuario_id=usuario_id)[m
+[1mdiff --git a/controllers/usuarios_controller.py b/controllers/usuarios_controller.py[m
+[1mindex 37321ff..e7765e7 100644[m
+[1m--- a/controllers/usuarios_controller.py[m
+[1m+++ b/controllers/usuarios_controller.py[m
+[36m@@ -36,7 +36,7 @@[m [mdef login():[m
+ [m
+     if usuario and usuario.verificar_senha(data.get("senha")):[m
+ [m
+[31m-        session["usuario_id"] = usuario.id  # mantém compatibilidade[m
+[32m+[m[32m        session["usuario_id"] = usuario.id # Armazena o ID do usuário na sessão[m
+ [m
+         token = gerar_token(usuario.id)[m
+         return jsonify({[m
+[1mdiff --git a/dbpostgres.py b/dbpostgres.py[m
+[1mindex 2dd9437..3930082 100644[m
+[1m--- a/dbpostgres.py[m
+[1m+++ b/dbpostgres.py[m
+[36m@@ -7,7 +7,7 @@[m [mload_dotenv()[m
+ from psycopg2.extras import RealDictCursor[m
+ from models import Livro, Usuario, Leitura[m
+ [m
+[31m-[m
+[32m+[m[32m'''[m
+ def get_connection():[m
+     url = os.environ["DATABASE_URL"][m
+ [m
+[36m@@ -17,6 +17,19 @@[m [mdef get_connection():[m
+ [m
+     # Local (GitHub Actions, sua máquina): sem SSL[m
+     return psycopg2.connect(url, sslmode="disable")[m
+[32m+[m[32m'''[m
+[32m+[m[32mdef get_connection():[m
+[32m+[m[32m    url = os.getenv("DATABASE_URL")[m
+[32m+[m
+[32m+[m[32m    if not url:[m
+[32m+[m[32m        raise Exception("DATABASE_URL não encontrada no ambiente (.env)")[m
+[32m+[m
+[32m+[m[32m    # Railway → precisa SSL[m
+[32m+[m[32m    if "railway.internal" in url:[m
+[32m+[m[32m        return psycopg2.connect(url, sslmode="require")[m
+[32m+[m
+[32m+[m[32m    # Local → desabilita SSL[m
+[32m+[m[32m    return psycopg2.connect(url, sslmode="disable")[m
+ [m
+ [m
+ def criar_tabelas():[m
+[36m@@ -92,6 +105,23 @@[m [mclass BancoDados:[m
+         cursor.close()[m
+         conn.close()[m
+ [m
+[32m+[m[32m    def buscarTodosLivros(self):[m
+[32m+[m[32m        conn = get_connection()[m
+[32m+[m[32m        cursor = conn.cursor()[m
+[32m+[m
+[32m+[m[32m        cursor.execute("SELECT id, titulo, autor, genero, ano_publicacao, imagem_url FROM livros")[m
+[32m+[m
+[32m+[m[32m        livros = [][m
+[32m+[m[32m        for row in cursor.fetchall():[m
+[32m+[m[32m            livro = Livro(row[1], row[2], row[3], row[4], row[5])[m
+[32m+[m[32m            livro.id = row[0][m
+[32m+[m[32m            livros.append(livro)[m
+[32m+[m
+[32m+[m[32m        cursor.close()[m
+[32m+[m[32m        conn.close()[m
+[32m+[m
+[32m+[m[32m        return livros[m
+[32m+[m
+ [m
+     def cadastrarLivro(self, id, titulo, autor, genero, ano_publicacao, imagem_url):[m
+         conn = get_connection()[m
+[36m@@ -112,7 +142,7 @@[m [mclass BancoDados:[m
+         return livro[m
+ [m
+ [m
+[31m-    def editarLivro(self, id, titulo, autor, genero, ano_publicicao, imagem_url=None):[m
+[32m+[m[32m    def editarLivro(self, id, titulo, autor, genero, ano_publicacao, imagem_url=None):[m
+         conn = get_connection()[m
+         cursor = conn.cursor()[m
+ [m
+[36m@@ -120,13 +150,13 @@[m [mclass BancoDados:[m
+       

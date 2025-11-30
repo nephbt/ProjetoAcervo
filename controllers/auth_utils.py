@@ -2,16 +2,16 @@ from flask import jsonify, request
 from functools import wraps
 import jwt
 import datetime
-from database import BancoDados
+from dbpostgres import bd
+from dbpostgres import get_connection
 
-bd = BancoDados()
 key = "chave_bem_secreta"
 
 
 def gerar_token(usuario_id):
     payload = {
         "id": usuario_id,
-        "exp": datetime.datetime.now() + datetime.timedelta(hours=2),
+        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=2)
     }
     token = jwt.encode(payload, key, algorithm="HS256")
     return token
@@ -34,19 +34,42 @@ def requerir_token(f):
         except jwt.InvalidTokenError:
             return jsonify({"erro": "Token inválido"}), 401
 
-        return f(id_usuario=id_usuario, *args, **kwargs)
+        return f(usuario_id=id_usuario, *args, **kwargs)
 
     return decorator
 
 
+# -----------------------------------------------------------------
+# Consulta o PostgreSQL
+# -----------------------------------------------------------------
 def verificar_usuario(f):
     @wraps(f)
     def decorator(*args, **kwargs):
         usuario_id = kwargs.get("usuario_id")
-        usuario = bd.usuarios.get(usuario_id)
-        if not usuario:
+
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "SELECT id, nome, email, senha, data_nasc FROM usuarios WHERE id = %s",
+            (usuario_id,)
+        )
+
+        row = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if not row:
             return jsonify({"Erro": "Usuário não encontrado"}), 404
-        # substitui usuario_id pelo objeto usuário
+        
+        usuario = {
+            "id": row[0],
+            "nome": row[1],
+            "email": row[2],
+            "senha": row[3],
+            "data_nasc": row[4]
+        }
+
         return f(usuario=usuario, *args, **kwargs)
 
     return decorator
@@ -56,16 +79,12 @@ def verificar_livro(f):
     @wraps(f)
     def decorator(*args, **kwargs):
         livro_id = kwargs.get("livro_id")
-        livro = bd.livros.get(livro_id)
 
-        # 🔍 Se não estiver no cache em memória, busca direto no banco
-        if not livro:
-            livro = bd.buscarLivroPorId(livro_id)
+        livro = bd.buscarLivroPorId(livro_id)
 
         if not livro:
             return jsonify({"Erro": "Livro não encontrado"}), 404
 
-        # passa o objeto livro adiante para a rota
         return f(livro=livro, *args, **kwargs)
 
     return decorator

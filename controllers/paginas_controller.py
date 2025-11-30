@@ -1,12 +1,11 @@
 from flask import Blueprint, render_template, session, redirect, url_for, request, jsonify
-from database import bd
+from dbpostgres import get_connection  # importa a função correta
 
-# Blueprint para páginas HTML
 pagesRoute = Blueprint("pages", __name__)
 
 
 # ------------------------------------------------------------
-# Homepage (acessível sem login)
+# Homepage
 @pagesRoute.route("/", methods=["GET"])
 def homepage():
     return render_template("index.html")
@@ -18,9 +17,17 @@ def homepage():
 def perfil_usuario():
     usuario_id = session.get("usuario_id")
     if not usuario_id:
-        return redirect(url_for("pages.homepage"))  # Redireciona se não logado
+        return redirect(url_for("pages.homepage"))
 
-    usuario = bd.usuarios.get(usuario_id)
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT id, nome, email FROM usuarios WHERE id = %s", (usuario_id,))
+    usuario = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
     return render_template("perfil.html", usuario=usuario)
 
 
@@ -28,26 +35,63 @@ def perfil_usuario():
 def home_page():
     usuario_id = session.get("usuario_id")
     if not usuario_id:
-        return redirect(url_for("pages.homepage"))  # Redireciona se não logado
+        return redirect(url_for("pages.homepage"))
 
-    usuario = bd.usuarios.get(usuario_id)
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT id, nome FROM usuarios WHERE id = %s", (usuario_id,))
+    usuario = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
     return render_template("home_page_usuarios.html", usuario=usuario)
 
 
-@pagesRoute.route(
-    "/minhas_leituras"
-)  # somente leituras dos livros e pesquisa dos livros
+# ------------------------------------------------------------
+# Página: Minhas leituras
+@pagesRoute.route("/minhas_leituras")
 def listar_livros():
     # Você pode pegar o usuario logado via session
     usuario_id = session.get("usuario_id")
-    livros = list(bd.livros.values())  # pega todos os livros
+    if not usuario_id:
+        return redirect(url_for("pages.homepage"))
+
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, titulo, autor, genero FROM livros")
+    livros = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
     return render_template("minhas_leituras.html", livros=livros, usuario_id=usuario_id)
 
 
-# Endpoint para pesquisar livros via fetch
+# ------------------------------------------------------------
+# Ajax: Pesquisa de livros
 @pagesRoute.route("/pesquisar_livros")
 def pesquisar_livros():
-    query = request.args.get("q", "").lower()
+    query = request.args.get("q", "").strip().lower()
+    if not query:
+        return jsonify([])
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT id, titulo, autor, genero
+        FROM livros
+        WHERE LOWER(titulo) LIKE %s
+           OR LOWER(autor)  LIKE %s
+           OR LOWER(genero) LIKE %s
+    """, (f"%{query}%", f"%{query}%", f"%{query}%"))
+
+    livros = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
     resultado = [
         livro.__dict__
         for livro in bd.livros.values()
@@ -62,7 +106,16 @@ def pesquisar_livros():
 def pagina_listar_livros():
     # Você pode pegar o usuario logado via session
     usuario_id = session.get("usuario_id")
-    livros = list(bd.livros.values())  # pega todos os livros
-    return render_template(
-        "gerenciar_livros.html", livros=livros, usuario_id=usuario_id
-    )
+    if not usuario_id:
+        return redirect(url_for("pages.homepage"))
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT id, titulo, autor, genero FROM livros")
+    livros = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return render_template("gerenciar_livros.html", livros=livros, usuario_id=usuario_id)
