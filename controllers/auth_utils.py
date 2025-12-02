@@ -8,6 +8,9 @@ from dbpostgres import get_connection
 key = "chave_bem_secreta"
 
 
+# ----------------------------
+# Gerar Token
+# ----------------------------
 def gerar_token(usuario_id):
     payload = {
         "id": usuario_id,
@@ -17,6 +20,9 @@ def gerar_token(usuario_id):
     return token
 
 
+# ----------------------------
+# Exigir token nas rotas
+# ----------------------------
 def requerir_token(f):
     @wraps(f)
     def decorator(*args, **kwargs):
@@ -75,6 +81,9 @@ def verificar_usuario(f):
     return decorator
 
 
+# ----------------------------
+# Verificar existência do livro
+# ----------------------------
 def verificar_livro(f):
     @wraps(f)
     def decorator(*args, **kwargs):

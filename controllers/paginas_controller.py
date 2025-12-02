@@ -3,7 +3,6 @@ from dbpostgres import get_connection  # importa a função correta
 
 pagesRoute = Blueprint("pages", __name__)
 
-
 # ------------------------------------------------------------
 # Homepage
 @pagesRoute.route("/", methods=["GET"])
@@ -31,6 +30,7 @@ def perfil_usuario():
     return render_template("perfil.html", usuario=usuario)
 
 
+# ------------------------------------------------------------
 @pagesRoute.route("/home_page_usuarios", methods=["GET"])
 def home_page():
     usuario_id = session.get("usuario_id")
@@ -53,7 +53,6 @@ def home_page():
 # Página: Minhas leituras
 @pagesRoute.route("/minhas_leituras")
 def listar_livros():
-    # Você pode pegar o usuario logado via session
     usuario_id = session.get("usuario_id")
     if not usuario_id:
         return redirect(url_for("pages.homepage"))
@@ -93,18 +92,17 @@ def pesquisar_livros():
     conn.close()
 
     resultado = [
-        livro.__dict__
-        for livro in bd.livros.values()
-        if query in livro.titulo.lower()
-        or query in livro.autor.lower()
-        or query in livro.genero.lower()
+        {"id": l[0], "titulo": l[1], "autor": l[2], "genero": l[3]}
+        for l in livros
     ]
+
     return jsonify(resultado)
 
 
-@pagesRoute.route("/crudes_livros")  # crud de livros
+# ------------------------------------------------------------
+# Página CRUD de livros
+@pagesRoute.route("/crudes_livros")
 def pagina_listar_livros():
-    # Você pode pegar o usuario logado via session
     usuario_id = session.get("usuario_id")
     if not usuario_id:
         return redirect(url_for("pages.homepage"))

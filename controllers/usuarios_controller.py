@@ -32,6 +32,7 @@ def cadastrarUsuario():
 @usuariosRoute.route("/login", methods=["POST"])
 def login():
     data = request.get_json() if request.is_json else request.form
+
     usuario = bd.buscarEmail(data.get("email"))
 
     if usuario and usuario.verificar_senha(data.get("senha")):
