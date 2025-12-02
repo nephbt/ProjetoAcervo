@@ -15,3 +15,6 @@ projeto_acervo
 # IDEs e metadados
 .vscode/
 .idea/
+
+# Ignorar cobertura de testes
+htmlcov/

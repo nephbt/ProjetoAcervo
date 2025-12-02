@@ -7,10 +7,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const formData = new FormData(form);
 
-        const resp = await fetch("/livros/cadastro", {
+        const resp = await fetch("/livros/", {
             method: "POST",
             body: formData
         });
+
 
         const data = await resp.json();
 

@@ -5,13 +5,17 @@ from controllers.auth_utils import verificar_livro
 
 livrosRoute = Blueprint("livros", __name__, url_prefix="/livros")
 
-
-# -------------------------------------
-# POST /livros/  → uparLivro
-# -------------------------------------
+# ------------------------------------------------------
+# POST /livros/  → cadastrar livro
+# ------------------------------------------------------
 @livrosRoute.route("/", methods=["POST"])
-def uparLivro():
+def cadastrarLivro():
     data = request.get_json() if request.is_json else request.form
+
+    campos_obrigatorios = ["titulo", "autor", "genero", "ano_publicacao"]
+    for campo in campos_obrigatorios:
+        if campo not in data:
+            return jsonify({"erro": f"Campo obrigatório faltando: {campo}"}), 400
 
     novo_livro = bd.cadastrarLivro(
         str(uuid.uuid4()),
@@ -22,58 +26,34 @@ def uparLivro():
         data.get("imagem")  # opcional
     )
 
-    return jsonify(novo_livro.__dict__), 201
+    return jsonify(novo_livro.to_dict()), 201
 
 
-# -------------------------------------
-# POST /livros/cadastro → cadastrarLivro
-# -------------------------------------
-@livrosRoute.route("/cadastro", methods=["POST"])
-def cadastrarLivro():
-    data = request.form
-    imagem_url = data.get("imagem")
-    id = str(uuid.uuid4())  # ID único gerado pelo backend
-
-    novo_livro = bd.cadastrarLivro(
-        id,
-        data["titulo"],
-        data["autor"],
-        data["genero"],
-        data["ano_publicacao"],
-        imagem_url,
-    )
-
-    return jsonify(novo_livro.__dict__), 201
-
-
-# -------------------------------------
-# GET /livros/<id> → retornarLivroId
-# -------------------------------------
+# ------------------------------------------------------
+# GET /livros/<id>
+# ------------------------------------------------------
 @livrosRoute.route("/<livro_id>", methods=["GET"])
 @verificar_livro
 def retornarLivroId(livro_id, livro):
-    return jsonify(livro.__dict__), 200
+    return jsonify(livro.to_dict()), 200
 
 
-# -------------------------------------
-# GET /livros/ → retornarLivros
-# -------------------------------------
+# ------------------------------------------------------
+# GET /livros/
+# ------------------------------------------------------
 @livrosRoute.route("/", methods=["GET"])
 def retornarLivros():
     livros = bd.buscarTodosLivros()
-    return jsonify([livro.__dict__ for livro in livros]), 200
+    return jsonify([livro.to_dict() for livro in livros]), 200
 
 
-# -------------------------------------
-# PUT /livros/<id> → editarLivro
-# -------------------------------------
+# ------------------------------------------------------
+# PUT /livros/<id>
+# ------------------------------------------------------
 @livrosRoute.route("/<livro_id>", methods=["PUT"])
-def editarLivro(livro_id):
+@verificar_livro
+def editarLivro(livro_id, livro):
     dados = request.get_json()
-
-    livro_existente = bd.buscarLivroPorId(livro_id)
-    if not livro_existente:
-        return jsonify({"erro": "Livro não encontrado"}), 404
 
     livro_atualizado = bd.editarLivro(
         livro_id,
@@ -81,18 +61,18 @@ def editarLivro(livro_id):
         dados.get("autor"),
         dados.get("genero"),
         dados.get("ano_publicacao"),
-        dados.get("imagem_url")
+        dados.get("imagem")
     )
 
     return jsonify({
         "mensagem": "Livro atualizado com sucesso!",
-        "livro": livro_atualizado.__dict__
+        "livro": livro_atualizado.to_dict()
     }), 200
 
 
-# -------------------------------------
-# DELETE /livros/<id> → excluirLivro
-# -------------------------------------
+# ------------------------------------------------------
+# DELETE /livros/<id>
+# ------------------------------------------------------
 @livrosRoute.route("/<livro_id>", methods=["DELETE"])
 @verificar_livro
 def excluirLivro(livro_id, livro):

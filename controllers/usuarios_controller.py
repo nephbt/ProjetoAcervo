@@ -5,29 +5,30 @@ from controllers.auth_utils import gerar_token, requerir_token, verificar_usuari
 usuariosRoute = Blueprint("usuarios", __name__, url_prefix="/usuarios")
 
 
-# -------------------------------------
-# POST /usuarios/cadastro → cadastrarUsuario
-# -------------------------------------
+# -----------------------------
+# Cadastro de usuário
+# -----------------------------
 @usuariosRoute.route("/cadastro", methods=["POST"])
 def cadastrarUsuario():
     data = request.get_json() if request.is_json else request.form
 
+    # Chama o método do BancoDados (PostgreSQL)
     novo_usuario = bd.cadastrarUsuario(
-        data["nome"],
-        data["email"],
-        data["senha"],
-        data["data_nasc"]
+        data.get("nome"),
+        data.get("email"),
+        data.get("senha"),
+        data.get("data_nasc")
     )
 
-    if novo_usuario is None:
+    if not novo_usuario:
         return jsonify({"erro": "E-mail já cadastrado!"}), 400
 
     return jsonify(novo_usuario.to_dict()), 201
 
 
-# -------------------------------------
-# POST /usuarios/login → login
-# -------------------------------------
+# -----------------------------
+# Login de usuário
+# -----------------------------
 @usuariosRoute.route("/login", methods=["POST"])
 def login():
     data = request.get_json() if request.is_json else request.form
@@ -35,45 +36,45 @@ def login():
     usuario = bd.buscarEmail(data.get("email"))
 
     if usuario and usuario.verificar_senha(data.get("senha")):
-
-        session["usuario_id"] = usuario.id  # mantém compatibilidade
-
+        session["usuario_id"] = usuario.id  # mantém sessão (opcional)
         token = gerar_token(usuario.id)
+
         return jsonify({
             "token": token,
             "usuario": {
                 "id": usuario.id,
                 "nome": usuario.nome,
-                "email": usuario.email
+                "email": usuario.email,
             }
         }), 200
 
     return jsonify({"erro": "Email ou senha incorretos"}), 401
 
 
-# -------------------------------------
-# GET /usuarios/<id> → retornarUsuarioId
-# -------------------------------------
+# -----------------------------
+# Retornar usuário por ID
+# -----------------------------
 @usuariosRoute.route("/<usuario_id>", methods=["GET"])
 @verificar_usuario
 def retornarUsuarioId(usuario_id, usuario):
-    """Agora recebe o usuário do decorator e não usa mais bd.usuarios."""
-    return jsonify(usuario.to_dict()), 200
+    # 'usuario' vem do decorator verificar_usuario
+    return jsonify(usuario), 200
 
 
-# -------------------------------------
-# GET /usuarios/ → retornarUsuario
-# -------------------------------------
+# -----------------------------
+# Listar todos os usuários
+# -----------------------------
 @usuariosRoute.route("/", methods=["GET"])
-def retornarUsuario():
-    usuarios = bd.buscarTodosUsuarios()
-    return jsonify([u.to_dict() for u in usuarios]), 200
+def retornarUsuarios():
+    usuarios = [u.to_dict() for u in bd.usuarios.values()]
+    return jsonify(usuarios), 200
 
 
-# -------------------------------------
-# GET /usuarios/perfil → perfil
-# -------------------------------------
-@usuariosRoute.route("/perfil", methods=["GET"])
+# -----------------------------
+# Perfil do usuário (JWT)
+# -----------------------------
+@usuariosRoute.route("/perfil", methods=["get"])
 @requerir_token
 def perfil(usuario_id):
     return jsonify({"mensagem": f"Bem-vindo usuário {usuario_id}!"}), 200
+

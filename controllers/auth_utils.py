@@ -2,8 +2,8 @@ from flask import jsonify, request
 from functools import wraps
 import jwt
 import datetime
-from dbpostgres import bd  # AGORA usa o Postgres
-# bd é sua instância de DatabasePostgres()
+from dbpostgres import bd
+from dbpostgres import get_connection
 
 key = "chave_bem_secreta"
 
@@ -45,17 +45,36 @@ def requerir_token(f):
     return decorator
 
 
-# ----------------------------
-# Verificar existência do usuário
-# ----------------------------
+# -----------------------------------------------------------------
+# Consulta o PostgreSQL
+# -----------------------------------------------------------------
 def verificar_usuario(f):
     @wraps(f)
     def decorator(*args, **kwargs):
         usuario_id = kwargs.get("usuario_id")
-        usuario = bd.usuarios.get(usuario_id)
 
-        if not usuario:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "SELECT id, nome, email, senha, data_nasc FROM usuarios WHERE id = %s",
+            (usuario_id,)
+        )
+
+        row = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if not row:
             return jsonify({"Erro": "Usuário não encontrado"}), 404
+        
+        usuario = {
+            "id": row[0],
+            "nome": row[1],
+            "email": row[2],
+            "senha": row[3],
+            "data_nasc": row[4]
+        }
 
         return f(usuario=usuario, *args, **kwargs)
 
@@ -70,12 +89,7 @@ def verificar_livro(f):
     def decorator(*args, **kwargs):
         livro_id = kwargs.get("livro_id")
 
-        # Primeiro tenta cache (se existir)
-        livro = bd.livros.get(livro_id) if hasattr(bd, "livros") else None
-
-        # Se não estiver no cache, busca no Postgres
-        if not livro:
-            livro = bd.buscarLivroPorId(livro_id)
+        livro = bd.buscarLivroPorId(livro_id)
 
         if not livro:
             return jsonify({"Erro": "Livro não encontrado"}), 404
