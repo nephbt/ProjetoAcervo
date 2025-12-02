@@ -1,11 +1,12 @@
-{"id":"81291","variant":"standard","title":"database.py reestruturado para PostgreSQL (Railway)"}
 import os
 import uuid
-import psycopg2
+import psycopg
+from psycopg import rows
 from dotenv import load_dotenv
 load_dotenv()
-from psycopg2.extras import RealDictCursor
+
 from models import Livro, Usuario, Leitura
+
 
 def get_connection():
     url = os.getenv("DATABASE_URL")
@@ -15,10 +16,10 @@ def get_connection():
 
     # Railway → precisa SSL
     if "railway.internal" in url:
-        return psycopg2.connect(url, sslmode="require")
+        return psycopg.connect(url, sslmode="require")
 
     # Local → desabilita SSL
-    return psycopg2.connect(url, sslmode="disable")
+    return psycopg.connect(url, sslmode="disable")
 
 
 def criar_tabelas():
@@ -71,13 +72,12 @@ class BancoDados:
         self.usuarios = {}
         self.carregarDados()
 
-
     def carregarDados(self):
         self.carregarLivros()
         self.carregarUsuarios()
 
     ############################################
-    ########## LIVROS ##########
+    # LIVROS
     ############################################
 
     def carregarLivros(self):
@@ -111,7 +111,6 @@ class BancoDados:
 
         return livros
 
-
     def cadastrarLivro(self, id, titulo, autor, genero, ano_publicacao, imagem_url):
         conn = get_connection()
         cursor = conn.cursor()
@@ -130,8 +129,7 @@ class BancoDados:
         self.livros[id] = livro
         return livro
 
-
-    def editarLivro(self, id, titulo, autor, genero, ano_publicacao, imagem_url=None):
+    def editarLivro(self, id, titulo, autor, genero, ano_publicizacao, imagem_url=None):
         conn = get_connection()
         cursor = conn.cursor()
 
@@ -139,17 +137,16 @@ class BancoDados:
             UPDATE livros SET titulo = %s, autor = %s, genero = %s, 
                               ano_publicacao = %s, imagem_url = %s 
             WHERE id = %s
-        """, (titulo, autor, genero, ano_publicacao, imagem_url, id))
+        """, (titulo, autor, genero, ano_publicizacao, imagem_url, id))
 
         conn.commit()
         cursor.close()
         conn.close()
 
-        livro = Livro(titulo, autor, genero, ano_publicacao, imagem_url)
+        livro = Livro(titulo, autor, genero, ano_publicizacao, imagem_url)
         livro.id = id
         self.livros[id] = livro
         return livro
-
 
     def buscarLivroPorId(self, livro_id):
         conn = get_connection()
@@ -165,7 +162,7 @@ class BancoDados:
             livro = Livro(row[1], row[2], row[3], row[4], row[5])
             livro.id = row[0]
             return livro
-        
+
     def excluirLivro(self, livro_id):
         conn = get_connection()
         cursor = conn.cursor()
@@ -177,16 +174,13 @@ class BancoDados:
         conn.close()
 
         if row:
-            # Remove do dicionário interno também
             if livro_id in self.livros:
                 del self.livros[livro_id]
             return True
         return False
 
-
-
     ############################################
-    ########## USUARIOS ##########
+    # USUARIOS
     ############################################
 
     def carregarUsuarios(self):
@@ -212,7 +206,6 @@ class BancoDados:
 
         cursor.close()
         conn.close()
-
 
     def cadastrarUsuario(self, nome, email, senha, data_nasc):
         conn = get_connection()
@@ -276,9 +269,8 @@ class BancoDados:
 
         return None
 
-
     ############################################
-    ########## LEITURAS ##########
+    # LEITURAS
     ############################################
 
     def carregarLeituras(self, idUsuario):
@@ -297,7 +289,6 @@ class BancoDados:
         conn.close()
         return leituras
 
-
     def cadastrarLeitura(self, idUsuario, idLivro, status, avaliacao, dataLeitura, comentario):
         conn = get_connection()
         cursor = conn.cursor()
@@ -315,7 +306,6 @@ class BancoDados:
         conn.close()
 
         return leitura
-
 
     def editarLeitura(self, idUsuario, idLivro, status, avaliacao, dataLeitura, comentario):
         conn = get_connection()
