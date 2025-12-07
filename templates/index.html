@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 
 <head>
     <meta charset="UTF-8">
@@ -13,23 +14,22 @@
     <!-- Cabeçalho -->
     <header>
         <div id="logo">
-            <img src="static\images\default.png" alt="Logo da Biblioteca"> <!-- Substitua por seu logo -->
+            <img src="static\images\logo.png" alt="Logo da Biblioteca"> <!-- Substitua por seu logo -->
         </div>
         <nav>
             <a href="/login_usuario">Login</a>
             <a href="/cadastro_usuario">Cadastro</a>
-            <a href="#">Sobre nós</a>
         </nav>
     </header>
 
     <!-- Corpo -->
     <main class="fade-in">
-        <h1>Bem-vindo ao seu Acervo</h1>
+        <h1>Bem-vindo ao Acervo</h1>
         <p>Descubra novos livros baseados no que você já leu! Faça login ou registre-se para ver recomendações
             personalizadas.</p>
         <section id="sugestoes">
             <h2>Sugestões do Dia</h2>
-            <p>Clique no botão abaixo para ver sugestões de livros.</p>
+            <p>Clique no botão abaixo para ver sugestões baseadas em seus livros lidos.</p>
             <button id="toggle-sugestoes">Mostrar Sugestões</button>
             <ul id="lista-sugestoes">
                 <li>Se você gostou de "1984" de George Orwell, recomendamos "Fahrenheit 451" de Ray Bradbury.</li>
@@ -43,18 +43,15 @@
     <footer>
         <div class="footer-container">
             <div class="footer-section sobre">
-                <h3>Biblioteca Sugestões</h3>
-                <p>Uma plataforma para registrar e descobrir novas leituras. Explore, avalie os seus livros favoritos!
-                </p>
+                <h3>Acervo</h3>
+                <p>Uma plataforma para registrar e descobrir novas leituras. Explore, avalie e descubra os seus livros favoritos!</p>
             </div>
 
             <div class="footer-section links">
-                <h4>Links Rápidos</h4>
+                <h4>Links rápidos</h4>
                 <ul>
-                    <li><a href="/">Início</a></li>
+                    <li><a href="/home_page_usuarios">Início</a></li>
                     <li><a href="/livros">Livros</a></li>
-                    <li><a href="/login_usuario">Login</a></li>
-                    <li><a href="/cadastro_usuario">Cadastro</a></li>
                 </ul>
             </div>
 
@@ -70,7 +67,7 @@
         </div>
 
         <div class="footer-bottom">
-            <p>&copy; 2025 Biblioteca Sugestões — Todos os direitos reservados.</p>
+            <p>&copy; 2025 Projeto Acervo — Todos os direitos reservados.</p>
         </div>
     </footer>
 
