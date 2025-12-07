@@ -3,7 +3,9 @@ name: CI/CD - Biblioteca Flask
 on:
   push:
     branches:
-      - '*'
+      - develop
+      - main
+      - pipeEFront
   pull_request:
     branches:
       - main
@@ -31,10 +33,10 @@ jobs:
       DATABASE_URL: postgresql://acervo_user:acervo_pass@localhost:5432/acervo_db
 
     steps:
-      - name: Checkout
+      - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: Configurar Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
@@ -47,10 +49,10 @@ jobs:
 
       - name: Instalar dependências
         run: |
-          pip install --upgrade pip
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Lint
+      - name: Lint com flake8
         run: |
           pip install flake8
           flake8 . || true
@@ -64,7 +66,7 @@ jobs:
           PYTHONPATH: .
         run: |
           pip install coverage pytest
-          coverage run -m pytest -v
+          coverage run -m pytest -v --disable-warnings --maxfail=1
           coverage xml -o reports/coverage.xml
 
       - name: Salvar relatório
@@ -97,4 +99,3 @@ jobs:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: |
           railway up --service ProjetoAcervo
-  

@@ -12,7 +12,7 @@ usuariosRoute = Blueprint("usuarios", __name__, url_prefix="/usuarios")
 def cadastrarUsuario():
     data = request.get_json() if request.is_json else request.form
 
-    # Chama o método do BancoDados (PostgreSQL)
+    # Chama o metodo do BancoDados (PostgreSQL)
     novo_usuario = bd.cadastrarUsuario(
         data.get("nome"),
         data.get("email"),
