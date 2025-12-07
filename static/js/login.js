@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("formLogin");
     const msg = document.getElementById("mensagem");
@@ -28,9 +27,13 @@ document.addEventListener("DOMContentLoaded", () => {
             localStorage.setItem("token", data.token);
             console.log("Token salvo:", data.token);
 
-            // redirecionar após login
+            // Redirecionar após login
             setTimeout(() => {
-                window.location.href = "/home_page_usuarios";
+                if (data.usuario.role === 'admin') {
+                    window.location.href = '/home_page_admin';
+                } else {
+                    window.location.href = '/home_page_usuarios';
+                }
             }, 1000);
         } else {
             msg.textContent = "❌ Erro: " + (data.erro || "Falha no login");
