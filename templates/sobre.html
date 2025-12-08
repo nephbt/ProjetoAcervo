@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sobre Nós - Acervo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
+    <style>
+        body {
+            font-family: 'Lora', serif;
+            font-weight: 400;
+        }
+
+        .sobre-container {
+            max-width: 800px;
+            margin: 60px auto;
+            padding: 40px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .sobre-container h1 {
+            font-size: 2.2rem;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        .sobre-container p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #555;
+            text-align: justify;
+        }
+
+        .sobre-container .destaque {
+            margin-top: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #e8f4f8, #d4edda);
+            border-radius: 10px;
+            font-weight: 500;
+            color: #2980b9;
+        }
+
+        .equipe {
+            margin-top: 40px;
+        }
+
+        .equipe h2 {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .equipe .nomes {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .equipe .nome {
+            background: #f8f9fa;
+            padding: 10px 25px;
+            border-radius: 20px;
+            font-weight: 500;
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Cabeçalho -->
+    <header>
+        <div id="logo">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo da Biblioteca">
+        </div>
+        <nav>
+            <a href="/">Início</a>
+            <a href="/login_usuario">Login</a>
+            <a href="/cadastro_usuario">Cadastro</a>
+            <a href="/sobre">Sobre nós</a>
+        </nav>
+    </header>
+
+    <!-- Corpo -->
+    <main class="fade-in">
+        <div class="sobre-container">
+            <h1>📚 Sobre o Acervo</h1>
+
+            <p>
+                O projeto Acervo nasceu da união da nossa paixão pelos livros com a necessidade de apresentar um trabalho acadêmico na faculdade de Análise e Desenvolvimento de Sistemas na PUC Goiás.
+            </p>
+            <p>
+                O projeto utiliza os conhecimentos aprendidos nas disciplinas de <strong>Estrutura de Dados Orientada a Objetos</strong>, <strong>DevOps</strong>, <strong>Segurança da Informação</strong> e <strong>Introdução à IA</strong>, aliados ao desejo dos alunos em desenvolver uma comunidade que possibilite aos amantes da leitura se conectar a livros que eles ainda não conhecem.
+            </p>
+
+            <div class="equipe">
+                <h2>👨‍💻 Nossa Equipe</h2>
+                <div class="nomes">
+                    <span class="nome">Bruno</span>
+                    <span class="nome">Halisson</span>
+                    <span class="nome">Rodrigo</span>
+                </div>
+            </div>
+
+            <div class="destaque">
+                🚀 Fiquem ligados para as próximas novidades do nosso projeto!
+            </div>
+        </div>
+    </main>
+
+    <!-- Rodapé -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section sobre">
+                <h3>Acervo</h3>
+                <p>Uma plataforma para registrar e descobrir novas leituras. Explore, avalie e descubra os seus livros favoritos!</p>
+            </div>
+
+            <div class="footer-section links">
+                <h4>Links rápidos</h4>
+                <ul>
+                    <li><a href="/">Início</a></li>
+                    <li><a href="/livros">Livros</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section contato">
+                <h4>Contato</h4>
+                <p>📧 projetoacervo@gmail.com</p>
+                <p>📞 (62) 98567-9987</p>
+                <div class="social">
+                    <a href="#"><img src="{{ url_for('static', filename='images/facebook.png') }}" alt="Facebook"></a>
+                    <a href="#"><img src="{{ url_for('static', filename='images/instagram.png') }}" alt="Instagram"></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2025 Projeto Acervo — Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/nav_helper.js') }}"></script>
+</body>
+
+</html>

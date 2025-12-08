@@ -5,6 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Gerenciar catálogo de livros</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
     <style>
         .crud-container {
@@ -235,6 +236,7 @@
             <a href="/home_page_usuarios">Início</a>
             <a href="/minhas_leituras">Adicionar leituras</a>
             <a href="/perfil">Perfil</a>
+            <a href="/sobre">Sobre nós</a>
         </nav>
     </header>
 
@@ -247,7 +249,7 @@
 
         <!-- SEÇÃO 1: Adicionar Novo Livro -->
         <div class="section">
-            <h2>➕ Adicionar Novo Livro</h2>
+            <h2>Adicionar novo livro</h2>
             <form id="formNovoLivro">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                     <div class="form-group">
@@ -280,7 +282,7 @@
 
         <!-- SEÇÃO 2: Lista de Livros -->
         <div class="section">
-            <h2>📖 Todos os Livros do Catálogo</h2>
+            <h2>📖 Todos os livros do Acervo</h2>
 
             <div class="busca-container">
                 <input type="text" id="busca" placeholder="Buscar por título, autor ou gênero...">
@@ -332,12 +334,12 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Ano de Publicação:</label>
+                    <label>Ano de publicação:</label>
                     <input type="number" id="editarAno" required>
                 </div>
 
                 <div class="form-group">
-                    <label>URL da Imagem:</label>
+                    <label>URL da imagem:</label>
                     <input type="text" id="editarImagem">
                 </div>
 
@@ -361,6 +363,7 @@
                 <ul>
                     <li><a href="/home_page_usuarios">Início</a></li>
                     <li><a href="/livros">Livros</a></li>
+                    <li><a href="/sobre">Sobre nós</a></li>
                 </ul>
             </div>
 
@@ -381,6 +384,7 @@
     </footer>
 
     <script src="{{ url_for('static', filename='js/gerenciar_livros.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/nav_helper.js') }}"></script>
 </body>
 
 </html>

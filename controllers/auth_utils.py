@@ -43,12 +43,9 @@ def requerir_token(f):
         except jwt.InvalidTokenError:
             return jsonify({"erro": "Token inválido"}), 401
 
-        # Injetar nomes compatíveis: (mantemos token_* e adicionamos usuario_*)
         kwargs["token_usuario_id"] = token_usuario_id
         kwargs["token_role"] = token_role
 
-        # Nomes antigos usados nas rotas: usuario_id / usuario_role
-        # Só sobrescreve se não existirem (evita clobbering)
         if "usuario_id" not in kwargs:
             kwargs["usuario_id"] = token_usuario_id
         if "usuario_role" not in kwargs:
@@ -79,12 +76,10 @@ def requerir_admin(f):
         if admin_role != "admin":
             return jsonify({"erro": "Acesso restrito a administradores"}), 403
 
-        # SÓ admin_id - REMOVA as linhas usuario_id e usuario_role
         kwargs["admin_id"] = admin_id
 
         return f(*args, **kwargs)
     return decorator
-
 
 
 # ----------------------------
@@ -96,18 +91,16 @@ def verificar_usuario(f):
     def decorator(*args, **kwargs):
         usuario_id = kwargs.get("usuario_id")
 
-        conn = get_connection()
-        cursor = conn.cursor()
-
-        try:
-            cursor.execute(
-                "SELECT id, nome, email, senha, data_nasc, role FROM usuarios WHERE id = %s",
-                (usuario_id,)
-            )
-            row = cursor.fetchone()
-        finally:
-            cursor.close()
-            conn.close()
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            try:
+                cursor.execute(
+                    "SELECT id, nome, email, senha, data_nasc, role FROM usuarios WHERE id = %s",
+                    (usuario_id,)
+                )
+                row = cursor.fetchone()
+            finally:
+                cursor.close()
 
         if not row:
             return jsonify({"erro": "Usuário não encontrado"}), 404
@@ -128,7 +121,7 @@ def verificar_usuario(f):
 
 
 # ----------------------------
-# Decorator: Verificar Livro (apenas aprovados)
+# Decorator: Verificar Livro
 # ----------------------------
 def verificar_livro(f):
     """Busca o livro aprovado no banco e passa para a rota."""
@@ -136,18 +129,16 @@ def verificar_livro(f):
     def decorator(*args, **kwargs):
         livro_id = kwargs.get("livro_id")
 
-        conn = get_connection()
-        cursor = conn.cursor()
-
-        try:
-            cursor.execute("""
-                SELECT id, titulo, autor, genero, ano_publicacao, imagem_url, status_aprovacao
-                FROM livros WHERE id = %s
-            """, (livro_id,))
-            row = cursor.fetchone()
-        finally:
-            cursor.close()
-            conn.close()
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            try:
+                cursor.execute("""
+                    SELECT id, titulo, autor, genero, ano_publicacao, imagem_url, status_aprovacao
+                    FROM livros WHERE id = %s
+                """, (livro_id,))
+                row = cursor.fetchone()
+            finally:
+                cursor.close()
 
         if not row:
             return jsonify({"erro": "Livro não encontrado"}), 404
@@ -169,7 +160,7 @@ def verificar_livro(f):
 
 
 # ----------------------------
-# Decorator: Verificar Livro Aprovado (para leituras)
+# Decorator: Verificar Livro Aprovado
 # ----------------------------
 def verificar_livro_aprovado(f):
     """Busca o livro e verifica se está aprovado."""
@@ -177,18 +168,16 @@ def verificar_livro_aprovado(f):
     def decorator(*args, **kwargs):
         livro_id = kwargs.get("livro_id")
 
-        conn = get_connection()
-        cursor = conn.cursor()
-
-        try:
-            cursor.execute("""
-                SELECT id, titulo, autor, genero, ano_publicacao, imagem_url, status_aprovacao
-                FROM livros WHERE id = %s
-            """, (livro_id,))
-            row = cursor.fetchone()
-        finally:
-            cursor.close()
-            conn.close()
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            try:
+                cursor.execute("""
+                    SELECT id, titulo, autor, genero, ano_publicacao, imagem_url, status_aprovacao
+                    FROM livros WHERE id = %s
+                """, (livro_id,))
+                row = cursor.fetchone()
+            finally:
+                cursor.close()
 
         if not row:
             return jsonify({"erro": "Livro não encontrado"}), 404
@@ -211,19 +200,19 @@ def verificar_livro_aprovado(f):
 
     return decorator
 
+
 def buscar_usuario_por_id(usuario_id):
     """Retorna dict do usuário ou None."""
-    conn = get_connection()
-    cursor = conn.cursor()
-    try:
-        cursor.execute(
-            "SELECT id, nome, email, senha, data_nasc, role FROM usuarios WHERE id = %s",
-            (usuario_id,)
-        )
-        row = cursor.fetchone()
-    finally:
-        cursor.close()
-        conn.close()
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        try:
+            cursor.execute(
+                "SELECT id, nome, email, senha, data_nasc, role FROM usuarios WHERE id = %s",
+                (usuario_id,)
+            )
+            row = cursor.fetchone()
+        finally:
+            cursor.close()
 
     if not row:
         return None
@@ -239,18 +228,17 @@ def buscar_usuario_por_id(usuario_id):
 
 
 def buscar_livro_por_id(livro_id):
-    """Retorna dict do livro (com imagem_url) ou None."""
-    conn = get_connection()
-    cursor = conn.cursor()
-    try:
-        cursor.execute("""
-            SELECT id, titulo, autor, genero, ano_publicacao, imagem_url, status_aprovacao
-            FROM livros WHERE id = %s
-        """, (livro_id,))
-        row = cursor.fetchone()
-    finally:
-        cursor.close()
-        conn.close()
+    """Retorna dict do livro ou None."""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        try:
+            cursor.execute("""
+                SELECT id, titulo, autor, genero, ano_publicacao, imagem_url, status_aprovacao
+                FROM livros WHERE id = %s
+            """, (livro_id,))
+            row = cursor.fetchone()
+        finally:
+            cursor.close()
 
     if not row:
         return None

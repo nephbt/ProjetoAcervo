@@ -5,7 +5,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perfil - {{ usuario.nome }}</title>
+    <title>Perfil</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
     <link rel="stylesheet" href="../static/css/home.css">
     <style>
         .perfil-container {
@@ -197,15 +198,16 @@
             <a href="/home_page_usuarios">Início</a>
             <a href="/minhas_leituras">Adicionar leitura</a>
             <a href="/crudes_livros">Cadastro de livros</a>
+            <a href="/sobre">Sobre nós</a>
         </nav>
     </header>
 
     <main class="perfil-container">
         <!-- Cabeçalho do Perfil -->
         <div class="perfil-header">
-            <h1>👤 {{ usuario.nome }}</h1>
-            <p>📧 {{ usuario.email }}</p>
-             <button id="btnEncerrar" class="btn-encerrar">Encerrar sessão</button>
+            <h1>👤 <span id="usuario-nome">Carregando...</span></h1>
+            <p>📧 <span id="usuario-email">Carregando...</span></p>
+            <button id="btnEncerrar" class="btn-encerrar">Encerrar sessão</button>
         </div>
 
         <!-- Estatísticas -->
@@ -241,6 +243,7 @@
                 <ul>
                     <li><a href="/home_page_usuarios">Início</a></li>
                     <li><a href="/livros">Livros</a></li>
+                    <li><a href="/sobre">Sobre nós</a></li>
                 </ul>
             </div>
 
@@ -263,16 +266,16 @@
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('🔍 Iniciando carregamento do perfil...');
-             document.getElementById('btnEncerrar').addEventListener('click', () => {
-                if (confirm('Deseja realmente encerrar a sessão?')) {
-                    localStorage.removeItem('token');
+            document.getElementById('btnEncerrar').addEventListener('click', () => {
+              if (confirm('Deseja realmente encerrar a sessão?')) {
+                 localStorage.removeItem('token');
                     window.location.href = '/login_usuario';
                 }
             });
-            await carregarEstatisticas();
+            await carregarPerfil();
         });
 
-        async function carregarEstatisticas() {
+        async function carregarPerfil() {
             const token = localStorage.getItem('token');
 
             if (!token) {
@@ -286,6 +289,18 @@
                 const userId = payload.id;
 
                 console.log('📌 User ID:', userId);
+
+                // ✅ Buscar dados do usuário
+                const userResp = await fetch('/usuarios/perfil', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (userResp.ok) {
+                    const usuario = await userResp.json();
+                    document.getElementById('usuario-nome').textContent = usuario.nome || 'Usuário';
+                    document.getElementById('usuario-email').textContent = usuario.email || '';
+                    console.log('✅ Dados do usuário carregados:', usuario.nome);
+                }
 
                 // Buscar leituras do usuário
                 console.log('🔄 Buscando leituras...');
@@ -313,9 +328,7 @@
                 document.getElementById('leituras-recentes-lista').innerHTML =
                     `<p class="erro-msg">Erro ao carregar leituras: ${erro.message}</p>`;
 
-                // Resetar estatísticas para 0
                 document.getElementById('total-livros').textContent = '0';
-                document.getElementById('media-avaliacoes').textContent = '-';
                 document.getElementById('genero-favorito').textContent = '-';
             }
         }
@@ -412,6 +425,7 @@
         }
     }
     </script>
+    <script src="{{ url_for('static', filename='js/nav_helper.js') }}"></script>
 </body>
 
 </html>

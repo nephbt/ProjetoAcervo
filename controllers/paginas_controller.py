@@ -12,20 +12,18 @@ def obter_todos_livros():
     """
     Retorna todos os livros aprovados do banco de dados.
     """
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    try:
-        cursor.execute("""
-            SELECT id, titulo, autor, genero, ano_publicacao, imagem_url
-            FROM livros
-            WHERE status_aprovacao = 'aprovado'
-            ORDER BY titulo
-        """)
-        rows = cursor.fetchall()
-    finally:
-        cursor.close()
-        conn.close()
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        try:
+            cursor.execute("""
+                SELECT id, titulo, autor, genero, ano_publicacao, imagem_url
+                FROM livros
+                WHERE status_aprovacao = 'aprovado'
+                ORDER BY titulo
+            """)
+            rows = cursor.fetchall()
+        finally:
+            cursor.close()
 
     return [
         {
@@ -44,16 +42,10 @@ def obter_todos_livros():
 # PÁGINAS PÚBLICAS
 # ============================================================
 
-@pagesRoute.route("/", methods=["GET"])
-def homepage():
-    """Página inicial - acessível sem login."""
-    return render_template("index.html")
-
-
 @pagesRoute.route("/login_usuario", methods=["GET"])
 def pagina_login():
     """Página de login."""
-    return render_template("login_usuario.html")
+    return render_template("login.html")
 
 
 @pagesRoute.route("/cadastro_usuario", methods=["GET"])
@@ -64,13 +56,11 @@ def pagina_cadastro():
 
 # ============================================================
 # PÁGINAS PROTEGIDAS
-# (A verificação de login é feita no frontend via JavaScript/JWT)
 # ============================================================
 
 @pagesRoute.route("/perfil", methods=["GET"])
 def perfil_usuario():
     """Página de perfil do usuário logado."""
-    # A verificação de autenticação é feita no JS da página
     return render_template("perfil.html", usuario={})
 
 
@@ -99,6 +89,11 @@ def pagina_listar_livros():
     return render_template("gerenciar_livros.html", livros=livros)
 
 
+@pagesRoute.route("/sobre")
+def pagina_sobre():
+    return render_template("sobre.html")
+
+
 # ============================================================
 # ENDPOINTS AJAX
 # ============================================================
@@ -107,31 +102,27 @@ def pagina_listar_livros():
 def pesquisar_livros():
     """
     Pesquisa livros aprovados por título, autor ou gênero.
-    Query param: ?q=termo
     """
     query = request.args.get("q", "").strip().lower()
 
     if not query:
         return jsonify([])
 
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    try:
-        cursor.execute("""
-            SELECT id, titulo, autor, genero, ano_publicacao, imagem_url
-            FROM livros
-            WHERE status_aprovacao = 'aprovado'
-              AND (LOWER(titulo) LIKE %s
-                   OR LOWER(autor) LIKE %s
-                   OR LOWER(genero) LIKE %s)
-            ORDER BY titulo
-        """, (f"%{query}%", f"%{query}%", f"%{query}%"))
-
-        rows = cursor.fetchall()
-    finally:
-        cursor.close()
-        conn.close()
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        try:
+            cursor.execute("""
+                SELECT id, titulo, autor, genero, ano_publicacao, imagem_url
+                FROM livros
+                WHERE status_aprovacao = 'aprovado'
+                  AND (LOWER(titulo) LIKE %s
+                       OR LOWER(autor) LIKE %s
+                       OR LOWER(genero) LIKE %s)
+                ORDER BY titulo
+            """, (f"%{query}%", f"%{query}%", f"%{query}%"))
+            rows = cursor.fetchall()
+        finally:
+            cursor.close()
 
     resultado = [
         {

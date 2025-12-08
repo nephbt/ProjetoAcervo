@@ -114,6 +114,8 @@
         .cta-button:hover {
             background: #357abd;
         }
+
+
     </style>
 </head>
 
@@ -127,6 +129,7 @@
             <a href="minhas_leituras">Adicionar leituras</a>
             <a href="crudes_livros">Cadastro de livros</a>
             <a href="perfil">Perfil</a>
+            <a href="/sobre">Sobre nós</a>
         </nav>
     </header>
 
@@ -162,6 +165,7 @@
                 <ul>
                     <li><a href="/home_page_usuarios">Início</a></li>
                     <li><a href="/livros">Livros</a></li>
+                    <li><a href="/sobre">Sobre nós</a></li>
                 </ul>
             </div>
 
@@ -288,6 +292,7 @@
             container.innerHTML = `<p>⚠️ ${mensagem}</p>`;
         }
     </script>
+    <script src="{{ url_for('static', filename='js/nav_helper.js') }}"></script>
 </body>
 
 </html>
