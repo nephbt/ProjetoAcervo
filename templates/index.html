@@ -4,38 +4,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
     <title>Biblioteca Sugestões</title>
-    <link rel="stylesheet" href="../static/css/home.css">
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/default.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
+    <style>
+        /* Estilos para os cards de sugestões */
+        .sugestoes-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .card-livro {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 200px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card-livro:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-livro img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+        }
+
+        .card-livro .info {
+            padding: 15px;
+            text-align: center;
+        }
+
+        .card-livro .info h3 {
+            font-size: 1rem;
+            margin: 0 0 5px 0;
+            color: #333;
+        }
+
+        .card-livro .info p {
+            font-size: 0.85rem;
+            color: #666;
+            margin: 0;
+        }
+
+        .card-livro .info .genero {
+            display: inline-block;
+            background: #e8f4f8;
+            color: #2980b9;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            margin-top: 8px;
+        }
+    </style>
 </head>
 
 <body>
     <!-- Cabeçalho -->
     <header>
         <div id="logo">
-            <img src="static\images\default.png" alt="Logo da Biblioteca"> <!-- Substitua por seu logo -->
+            <img src="static/images/logo.png" alt="Logo da Biblioteca">
         </div>
         <nav>
             <a href="/login_usuario">Login</a>
             <a href="/cadastro_usuario">Cadastro</a>
-            <a href="#">Sobre nós</a>
+            <a href="/sobre">Sobre nós</a>
         </nav>
     </header>
 
     <!-- Corpo -->
     <main class="fade-in">
-        <h1>Bem-vindo ao seu Acervo</h1>
-        <p>Descubra novos livros baseados no que você já leu! Faça login ou registre-se para ver recomendações
-            personalizadas.</p>
+        <h1>Bem-vindo ao Acervo</h1>
+        <h3><p>Descubra novos livros baseados no que você já leu!<br>
+        <p>Faça <a href="/login_usuario">login</a> ou <a href="/cadastro_usuario">registre-se</a> para ver recomendações personalizadas.</p>
+        <br></h3>
         <section id="sugestoes">
-            <h2>Sugestões do Dia</h2>
-            <p>Clique no botão abaixo para ver sugestões de livros.</p>
-            <button id="toggle-sugestoes">Mostrar Sugestões</button>
-            <ul id="lista-sugestoes">
-                <li>Se você gostou de "1984" de George Orwell, recomendamos "Fahrenheit 451" de Ray Bradbury.</li>
-                <li>Para fãs de ficção científica, experimente "Dune" de Frank Herbert.</li>
-                <li>Baseado em romances clássicos, leia "Orgulho e Preconceito" de Jane Austen.</li>
-            </ul>
+            <h2>Sugestões do dia</h2>
+
+            <div class="sugestoes-container">
+                <!-- Card 1 -->
+                <div class="card-livro">
+                    <img src="https://m.media-amazon.com/images/I/71OFqSRFDgL._SY466_.jpg" alt="Fahrenheit 451">
+                    <div class="info">
+                        <h3>Fahrenheit 451</h3>
+                        <p>Ray Bradbury</p>
+                        <span class="genero">Ficção Científica</span>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="card-livro">
+                    <img src="https://m.media-amazon.com/images/I/81zN7udGRUL._SY466_.jpg" alt="Duna">
+                    <div class="info">
+                        <h3>Duna</h3>
+                        <p>Frank Herbert</p>
+                        <span class="genero">Ficção Científica</span>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="card-livro">
+                    <img src="https://m.media-amazon.com/images/I/71Q1tPupKjL._SY466_.jpg" alt="Orgulho e Preconceito">
+                    <div class="info">
+                        <h3>Orgulho e Preconceito</h3>
+                        <p>Jane Austen</p>
+                        <span class="genero">Romance</span>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="card-livro">
+                    <img src="https://m.media-amazon.com/images/I/71kxa1-0mfL._SY466_.jpg" alt="1984">
+                    <div class="info">
+                        <h3>1984</h3>
+                        <p>George Orwell</p>
+                        <span class="genero">Ficção Científica</span>
+                    </div>
+                </div>
+
+                <!-- Card 5 -->
+                <div class="card-livro">
+                    <img src="https://m.media-amazon.com/images/I/81hCVEC0ExL._SY466_.jpg" alt="O Senhor dos Anéis">
+                    <div class="info">
+                        <h3>O Senhor dos Anéis</h3>
+                        <p>J.R.R. Tolkien</p>
+                        <span class="genero">Fantasia</span>
+                    </div>
+                </div>
+            </div>
         </section>
     </main>
 
@@ -43,18 +152,16 @@
     <footer>
         <div class="footer-container">
             <div class="footer-section sobre">
-                <h3>Biblioteca Sugestões</h3>
-                <p>Uma plataforma para registrar e descobrir novas leituras. Explore, avalie os seus livros favoritos!
-                </p>
+                <h3>Acervo</h3>
+                <p>Uma plataforma para registrar e descobrir novas leituras. Explore, avalie e descubra os seus livros favoritos!</p>
             </div>
 
             <div class="footer-section links">
-                <h4>Links Rápidos</h4>
+                <h4>Links rápidos</h4>
                 <ul>
-                    <li><a href="/">Início</a></li>
+                    <li><a href="/home_page_usuarios">Início</a></li>
                     <li><a href="/livros">Livros</a></li>
-                    <li><a href="/login_usuario">Login</a></li>
-                    <li><a href="/cadastro_usuario">Cadastro</a></li>
+                    <li><a href="/sobre">Sobre nós</a></li>
                 </ul>
             </div>
 
@@ -63,38 +170,18 @@
                 <p>📧 projetoacervo@gmail.com</p>
                 <p>📞 (62) 98567-9987</p>
                 <div class="social">
-                    <a href="#"><img src="/static/images/facebook.png" alt="Facebook"></a>
-                    <a href="#"><img src="/static/images/instagram.png" alt="Instagram"></a>
+                    <a href="#"><img src="{{ url_for('static', filename='images/facebook.png') }}" alt="Facebook"></a>
+                    <a href="#"><img src="{{ url_for('static', filename='images/instagram.png') }}" alt="Instagram"></a>
                 </div>
             </div>
         </div>
 
         <div class="footer-bottom">
-            <p>&copy; 2025 Biblioteca Sugestões — Todos os direitos reservados.</p>
+            <p>&copy; 2025 Projeto Acervo — Todos os direitos reservados.</p>
         </div>
     </footer>
 
-    <!-- JavaScript -->
-    <script>
-        // Animação de fade-in na página
-        document.addEventListener('DOMContentLoaded', function () {
-            document.body.classList.add('fade-in');
-        });
-
-        // Toggle para mostrar/ocultar sugestões
-        const toggleButton = document.getElementById('toggle-sugestoes');
-        const listaSugestoes = document.getElementById('lista-sugestoes');
-
-        toggleButton.addEventListener('click', function () {
-            if (listaSugestoes.style.display === 'none' || listaSugestoes.style.display === '') {
-                listaSugestoes.style.display = 'block';
-                toggleButton.textContent = 'Ocultar Sugestões';
-            } else {
-                listaSugestoes.style.display = 'none';
-                toggleButton.textContent = 'Mostrar Sugestões';
-            }
-        });
-    </script>
+    <script src="{{ url_for('static', filename='js/nav_helper.js') }}"></script>
 </body>
 
 </html>

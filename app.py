@@ -3,6 +3,7 @@ from controllers.livros_controller import livrosRoute
 from controllers.usuarios_controller import usuariosRoute
 from controllers.leituras_controller import leiturasRoute
 from controllers.paginas_controller import pagesRoute
+from controllers.recomendacoes_controller import recomendacoesRoute
 
 app = Flask(__name__)
 app.secret_key = "chave_muito_secreta"
@@ -13,6 +14,7 @@ app.register_blueprint(livrosRoute)
 app.register_blueprint(usuariosRoute)
 app.register_blueprint(leiturasRoute)
 app.register_blueprint(pagesRoute)
+app.register_blueprint(recomendacoesRoute)
 
 # ------------------------------------------------------------
 # Rotas principais de páginas HTML
