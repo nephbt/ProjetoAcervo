@@ -6,6 +6,7 @@ import datetime
 
 from controllers.auth_utils import SECRET_KEY
 
+from controllers.auth_utils import SECRET_KEY
 
 # ----------------------------------------
 # MOCK DECORATORS

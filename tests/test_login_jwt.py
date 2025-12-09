@@ -45,7 +45,6 @@ def test_login_usuario_mockado(client):
         assert "token" in data
         assert data["usuario"]["email"] == "joao@teste.com"
 
-
 # ================================
 #  TESTE ROTA PROTEGIDA
 # ================================
