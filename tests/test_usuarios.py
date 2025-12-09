@@ -5,6 +5,7 @@ from unittest.mock import MagicMock, patch
 from app import app
 from controllers.auth_utils import SECRET_KEY
 
+
 @pytest.fixture
 def client():
     return app.test_client()
@@ -101,7 +102,7 @@ def test_rota_perfil_autenticada(client):
     with patch("controllers.usuarios_controller.get_connection") as mock_conn:
         mock_cursor = MagicMock()
         mock_conn.return_value.__enter__.return_value.cursor.return_value = mock_cursor
-        
+
         # Simular SELECT do usuário
         mock_cursor.fetchone.return_value = (
             "123",  # id

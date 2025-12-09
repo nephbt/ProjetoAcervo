@@ -9,6 +9,11 @@
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
     <link rel="stylesheet" href="../static/css/home.css">
     <style>
+        .logo img {
+            height: 60px;
+            border-radius: 5px;
+        }
+
         .perfil-container {
             max-width: 1000px;
             margin: 40px auto;
@@ -263,122 +268,140 @@
         </div>
     </footer>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            console.log('🔍 Iniciando carregamento do perfil...');
-            document.getElementById('btnEncerrar').addEventListener('click', () => {
-              if (confirm('Deseja realmente encerrar a sessão?')) {
-                 localStorage.removeItem('token');
-                    window.location.href = '/login_usuario';
-                }
-            });
-            await carregarPerfil();
-        });
-
-        async function carregarPerfil() {
-            const token = localStorage.getItem('token');
-
-            if (!token) {
-                console.error('❌ Token não encontrado!');
+ <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        console.log('🔍 Iniciando carregamento do perfil...');
+        document.getElementById('btnEncerrar').addEventListener('click', () => {
+            if (confirm('Deseja realmente encerrar a sessão?')) {
+                localStorage.removeItem('token');
                 window.location.href = '/login_usuario';
-                return;
             }
+        });
+        await carregarPerfil();
+    });
 
-            try {
-                const payload = JSON.parse(atob(token.split('.')[1]));
-                const userId = payload.id;
+    async function carregarPerfil() {
+        const token = localStorage.getItem('token');
 
-                console.log('📌 User ID:', userId);
-
-                // ✅ Buscar dados do usuário
-                const userResp = await fetch('/usuarios/perfil', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                if (userResp.ok) {
-                    const usuario = await userResp.json();
-                    document.getElementById('usuario-nome').textContent = usuario.nome || 'Usuário';
-                    document.getElementById('usuario-email').textContent = usuario.email || '';
-                    console.log('✅ Dados do usuário carregados:', usuario.nome);
-                }
-
-                // Buscar leituras do usuário
-                console.log('🔄 Buscando leituras...');
-                const response = await fetch(`/leituras/${userId}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                console.log('📡 Status da resposta:', response.status);
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('❌ Erro na resposta:', errorText);
-                    throw new Error('Erro ao carregar leituras');
-                }
-
-                const leituras = await response.json();
-                console.log('✅ Leituras carregadas:', leituras);
-
-                // Calcular estatísticas
-                await calcularEstatisticas(leituras);
-                await renderizarLeituras(leituras);
-
-            } catch (erro) {
-                console.error('❌ Erro completo:', erro);
-                document.getElementById('leituras-recentes-lista').innerHTML =
-                    `<p class="erro-msg">Erro ao carregar leituras: ${erro.message}</p>`;
-
-                document.getElementById('total-livros').textContent = '0';
-                document.getElementById('genero-favorito').textContent = '-';
-            }
+        if (!token) {
+            console.error('❌ Token não encontrado!');
+            window.location.href = '/login_usuario';
+            return;
         }
 
-        async function calcularEstatisticas(leituras) {
-            console.log('📊 Calculando estatísticas...');
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const userId = payload.id;
+            const isAdmin = payload.role === 'admin';
 
-            const livrosLidos = leituras.filter(l => l.status === 'lido').length;
-            document.getElementById('total-livros').textContent = livrosLidos;
-            console.log('📚 Total de livros lidos:', livrosLidos);
+            // ✅ Buscar dados do usuário
+            const userResp = await fetch('/usuarios/perfil', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
 
-            // Gênero favorito
-            const generos = {};
+            if (userResp.ok) {
+                const usuario = await userResp.json();
+                document.getElementById('usuario-nome').textContent = usuario.nome || 'Usuário';
+                document.getElementById('usuario-email').textContent = usuario.email || '';
+            }
 
-            for (const leitura of leituras) {
-                if (leitura.status === 'lido') {  // Só contar livros realmente lidos
-                    try {
-                        const livroResp = await fetch(`/livros/${leitura.id_livro}`);
-                        if (livroResp.ok) {
-                            const livro = await livroResp.json();
-                            generos[livro.genero] = (generos[livro.genero] || 0) + 1;
-                            console.log(`📚 Contando gênero: ${livro.genero}`);
-                        }
-                    } catch (e) {
-                        console.warn('⚠️ Erro ao buscar livro:', e);
+            // ✅ SE FOR ADMIN: esconde estatísticas e leituras
+            if (isAdmin) {
+                document.querySelector('.estatisticas-grid').style.display = 'none';
+                document.querySelector('.leituras-recentes').style.display = 'none';
+
+                // Ajusta o header do nav para admin
+                const nav = document.querySelector('nav');
+                if (nav) {
+                    nav.innerHTML = `
+                        <a href="/home_page_admin">Início</a>
+                        <a href="/cadastro_livros">Cadastro de livros</a>
+                        <a href="/sobre">Sobre nós</a>
+                        <span class="admin-badge" style="background: #e74c3c; color: white; padding: 5px 10px; border-radius: 5px; font-size: 0.8em; margin-left: 10px;">🛡️ Admin</span>
+                    `;
+                }
+                return; // Não carrega leituras para admin
+            }
+
+            // ============ CÓDIGO PARA USUÁRIO COMUM ============
+            // Ajusta o header do nav para usuário
+            const nav = document.querySelector('nav');
+            if (nav) {
+                nav.innerHTML = `
+                    <a href="/home_page_usuarios">Início</a>
+                    <a href="/minhas_leituras">Adicionar leitura</a>
+                    <a href="/crudes_livros">Cadastro de livros</a>
+                    <a href="/sobre">Sobre nós</a>
+                `;
+            }
+
+            // Buscar leituras do usuário
+            console.log('🔄 Buscando leituras...');
+            const response = await fetch(`/leituras/${userId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (!response.ok) {
+                throw new Error('Erro ao carregar leituras');
+            }
+
+            const leituras = await response.json();
+            console.log('✅ Leituras carregadas:', leituras);
+
+            await calcularEstatisticas(leituras);
+            await renderizarLeituras(leituras);
+
+        } catch (erro) {
+            console.error('❌ Erro completo:', erro);
+            document.getElementById('leituras-recentes-lista').innerHTML =
+                `<p class="erro-msg">Erro ao carregar leituras: ${erro.message}</p>`;
+
+            document.getElementById('total-livros').textContent = '0';
+            document.getElementById('genero-favorito').textContent = '-';
+        }
+    }
+
+    async function calcularEstatisticas(leituras) {
+        console.log('📊 Calculando estatísticas...');
+
+        const livrosLidos = leituras.filter(l => l.status === 'lido').length;
+        document.getElementById('total-livros').textContent = livrosLidos;
+
+        const generos = {};
+
+        for (const leitura of leituras) {
+            if (leitura.status === 'lido') {
+                try {
+                    const livroResp = await fetch(`/livros/${leitura.id_livro}`);
+                    if (livroResp.ok) {
+                        const livro = await livroResp.json();
+                        generos[livro.genero] = (generos[livro.genero] || 0) + 1;
                     }
+                } catch (e) {
+                    console.warn('⚠️ Erro ao buscar livro:', e);
                 }
             }
-
-            console.log('🎭 Gêneros contados:', generos);
-
-            const generoFavorito = Object.keys(generos).length > 0
-                ? Object.keys(generos).reduce((a, b) => generos[a] > generos[b] ? a : b)
-                : '-';
-
-            document.getElementById('genero-favorito').textContent = generoFavorito;
-            console.log('❤️ Gênero favorito:', generoFavorito);
         }
 
-        const placeholder = '/static/images/default.png'; // Defina o caminho do placeholder
+        const generoFavorito = Object.keys(generos).length > 0
+            ? Object.keys(generos).reduce((a, b) => generos[a] > generos[b] ? a : b)
+            : '-';
+
+        document.getElementById('genero-favorito').textContent = generoFavorito;
+    }
+
+    const placeholder = '/static/images/default.png';
 
     async function renderizarLeituras(leituras) {
         const container = document.getElementById('leituras-recentes-lista');
-        console.log('🎨 Renderizando leituras...');
+
         if (leituras.length === 0) {
             container.innerHTML = '<p style="text-align: center; color: #999;">Você ainda não registrou nenhuma leitura. <a href="/minhas_leituras">Registrar agora</a></p>';
             return;
         }
+
         container.innerHTML = '';
-        // Ordenar por data mais recente
+
         const leiturasOrdenadas = leituras
             .filter(l => l.dataLeitura || l.data_leitura)
             .sort((a, b) => {
@@ -386,8 +409,8 @@
                 const dataB = new Date(b.dataLeitura || b.data_leitura);
                 return dataB - dataA;
             })
-            .slice(0, 10); // Mostrar até 10
-        console.log('📋 Leituras ordenadas:', leiturasOrdenadas.length);
+            .slice(0, 10);
+
         for (const leitura of leiturasOrdenadas) {
             try {
                 const livroResp = await fetch(`/livros/${leitura.id_livro}`);
@@ -417,14 +440,13 @@
                         </div>
                     `;
                     container.appendChild(item);
-                    console.log('✅ Leitura renderizada:', livro.titulo);
                 }
             } catch (e) {
                 console.warn('⚠️ Erro ao renderizar leitura:', e);
             }
         }
     }
-    </script>
+</script>
     <script src="{{ url_for('static', filename='js/nav_helper.js') }}"></script>
 </body>
 

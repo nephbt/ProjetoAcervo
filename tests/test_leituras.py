@@ -6,6 +6,8 @@ import datetime
 
 from controllers.auth_utils import SECRET_KEY
 
+from controllers.auth_utils import SECRET_KEY
+
 # ----------------------------------------
 # MOCK DECORATORS
 # ----------------------------------------
@@ -22,6 +24,7 @@ def fake_verificar_usuario(f):
             "role": "usuario"
         }
         return f(*args, **kwargs)
+
     return wrapper
 
 
@@ -31,9 +34,12 @@ def fake_verificar_livro(f):
         class LivroFake:
             id = "456"
             titulo = "Livro A"
+
         kwargs["livro"] = LivroFake()
         return f(*args, **kwargs)
+
     return wrapper
+
 
 # ----------------------------------------
 # FIXTURE DO CLIENT CORRETA
@@ -49,8 +55,7 @@ def client():
 
     return client'''
     with patch("controllers.auth_utils.verificar_usuario", fake_verificar_usuario), \
-         patch("controllers.auth_utils.verificar_livro", fake_verificar_livro):
-
+            patch("controllers.auth_utils.verificar_livro", fake_verificar_livro):
         from app import app
         app.testing = True
         client = app.test_client()
@@ -83,20 +88,19 @@ def test_registrar_leitura_sucesso(client):
 
     # Mock da lista encadeada
     with patch("controllers.leituras_controller.gerenciador_leituras.obter_lista") as mock_obter_lista, \
-         patch("controllers.leituras_controller.buscar_livro_por_id", return_value=livro_mock), \
-         patch("controllers.leituras_controller.limpar_cache_usuario"), \
-         patch("controllers.leituras_controller.get_connection") as mock_conn:
-        
+            patch("controllers.leituras_controller.buscar_livro_por_id", return_value=livro_mock), \
+            patch("controllers.leituras_controller.limpar_cache_usuario"), \
+            patch("controllers.leituras_controller.get_connection") as mock_conn:
         # Mock da lista encadeada
         mock_lista = MagicMock()
         mock_lista.contem.return_value = False  # Livro ainda não foi lido
         mock_lista.tamanho.return_value = 1
         mock_obter_lista.return_value = mock_lista
-        
+
         # Mock do cursor do banco
         mock_cursor = MagicMock()
         mock_conn.return_value.__enter__.return_value.cursor.return_value = mock_cursor
-        
+
         # Simular INSERT RETURNING
         mock_cursor.fetchone.return_value = (
             "leitura-123",  # id

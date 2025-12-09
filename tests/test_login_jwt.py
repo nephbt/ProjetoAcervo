@@ -62,14 +62,14 @@ def test_rota_protegida_com_token(client):
     with patch("controllers.usuarios_controller.get_connection") as mock_conn:
         mock_cursor = MagicMock()
         mock_conn.return_value.__enter__.return_value.cursor.return_value = mock_cursor
-        
+
         # Simular SELECT
         mock_cursor.fetchone.return_value = (
             "123", "João", "joao@teste.com", "2000-01-01", "usuario"
         )
 
         response = client.get("/usuarios/perfil", headers=headers)
-        
+
         assert response.status_code == 200
         data = response.get_json()
         assert data["id"] == "123"

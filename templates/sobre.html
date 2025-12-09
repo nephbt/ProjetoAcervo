@@ -49,6 +49,11 @@
             color: #2980b9;
         }
 
+        .logo img {
+            height: 60px;
+            border-radius: 5px;
+        }
+
         .equipe {
             margin-top: 40px;
         }
@@ -77,16 +82,13 @@
 </head>
 
 <body>
-    <!-- Cabeçalho -->
+    <!-- Cabeçalho - será preenchido pelo JavaScript -->
     <header>
         <div id="logo">
-            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo da Biblioteca">
+            <img src="../static/images/logo.png" alt="Logo da Biblioteca">
         </div>
-        <nav>
-            <a href="/">Início</a>
-            <a href="/login_usuario">Login</a>
-            <a href="/cadastro_usuario">Cadastro</a>
-            <a href="/sobre">Sobre nós</a>
+        <nav id="nav-principal">
+            <!-- Links serão inseridos via JS -->
         </nav>
     </header>
 
@@ -103,13 +105,15 @@
             </p>
 
             <div class="equipe">
-                <h2>👨‍💻 Nossa Equipe</h2>
+                <h2>👨‍💻 Nossa equipe:</h2>
+                <br>
                 <div class="nomes">
                     <span class="nome">Bruno</span>
                     <span class="nome">Halisson</span>
                     <span class="nome">Rodrigo</span>
                 </div>
             </div>
+                <br>
 
             <div class="destaque">
                 🚀 Fiquem ligados para as próximas novidades do nosso projeto!
@@ -149,7 +153,89 @@
         </div>
     </footer>
 
-    <script src="{{ url_for('static', filename='js/nav_helper.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const nav = document.getElementById('nav-principal');
+    const footerLinks = document.getElementById('footer-links');
+    const token = localStorage.getItem('token');
+
+    let isLogado = false;
+    let isAdmin = false;
+
+    // Verifica se está logado e qual o role
+    if (token) {
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const agora = Math.floor(Date.now() / 1000);
+
+            if (payload.exp && payload.exp > agora) {
+                isLogado = true;
+                isAdmin = payload.role === 'admin';
+            } else {
+                localStorage.removeItem('token');
+            }
+        } catch (e) {
+            localStorage.removeItem('token');
+        }
+    }
+
+    // Define os links baseado no estado do usuário
+    let navLinks = '';
+    let footerLinksHtml = '';
+
+    if (!isLogado) {
+        // ============ USUÁRIO DESLOGADO ============
+        navLinks = `
+            <a href="/">Início</a>
+            <a href="/login_usuario">Login</a>
+            <a href="/cadastro_usuario">Cadastro</a>
+            <a href="/sobre" class="active">Sobre nós</a>
+        `;
+        footerLinksHtml = `
+            <li><a href="/">Início</a></li>
+            <li><a href="/login_usuario">Login</a></li>
+            <li><a href="/cadastro_usuario">Cadastro</a></li>
+            <li><a href="/sobre">Sobre nós</a></li>
+        `;
+    } else {
+        // ============ USUÁRIO LOGADO (comum ou admin) ============
+        if (isAdmin) {
+            // ✅ ADMIN - Não mostra "Adicionar leituras"
+            navLinks = `
+                <a href="/home_page_admin">Início</a>
+                <a href="/crudes_livros">Cadastro de livros</a>
+                <a href="/perfil">Perfil</a>
+                <a href="/sobre" class="active">Sobre nós</a>
+                <span class="admin-badge" style="background: #e74c3c; color: white; padding: 5px 10px; border-radius: 5px; font-size: 0.8em; margin-left: 10px;">🛡️ Admin</span>
+            `;
+            footerLinksHtml = `
+                <li><a href="/home_page_admin">Início</a></li>
+                <li><a href="/crudes_livros">Cadastro de livros</a></li>
+                <li><a href="/sobre">Sobre nós</a></li>
+            `;
+        } else {
+            // ✅ USUÁRIO COMUM
+            navLinks = `
+                <a href="/home_page_usuarios">Início</a>
+                <a href="/minhas_leituras">Adicionar leituras</a>
+                <a href="/crudes_livros">Cadastro de livros</a>
+                <a href="/perfil">Perfil</a>
+                <a href="/sobre" class="active">Sobre nós</a>
+            `;
+            footerLinksHtml = `
+                <li><a href="/home_page_usuarios">Início</a></li>
+                <li><a href="/minhas_leituras">Adicionar leituras</a></li>
+                <li><a href="/perfil">Perfil</a></li>
+                <li><a href="/sobre">Sobre nós</a></li>
+            `;
+        }
+    }
+
+    // Aplica os links
+    nav.innerHTML = navLinks;
+    footerLinks.innerHTML = footerLinksHtml;
+});
+</script>
 </body>
 
 </html>

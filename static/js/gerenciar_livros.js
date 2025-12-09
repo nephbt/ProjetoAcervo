@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     // IDs CORRETOS
-    const form = document.getElementById("formNovoLivro");  // ← Corrigido!
+    const form = document.getElementById("formNovoLivro");
     const tabela = document.getElementById("tabelaLivros");
     const msg = document.getElementById("mensagem");
     const busca = document.getElementById("busca");
@@ -21,6 +21,20 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
+    // ✅ Função auxiliar para gerar HTML das ações (só para admin)
+    function getAcoesHTML(livro) {
+        // isAdmin é definido no HTML antes deste script carregar
+        if (typeof isAdmin !== 'undefined' && isAdmin) {
+            return `
+                <td class="acoes">
+                    <button class="btn-editar" data-id="${livro.id}">✏️ Editar</button>
+                    <button class="btn-excluir" data-id="${livro.id}">🗑️ Excluir</button>
+                </td>
+            `;
+        }
+        return ''; // Usuário comum não vê botões
+    }
+
     // --- CADASTRAR LIVRO ---
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -33,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
             autor: formData.get("autor"),
             genero: formData.get("genero"),
             ano_publicacao: formData.get("ano_publicacao"),
-            imagem_url: formData.get("imagem") || null  // ← Renomeado!
+            imagem_url: formData.get("imagem") || null
         };
 
         console.log("📚 Cadastrando livro:", data);
@@ -43,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`  // ← Token adicionado!
+                    "Authorization": `Bearer ${token}`
                 },
                 body: JSON.stringify(data)
             });
@@ -52,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("📡 Resposta:", resultado);
 
             if (resp.ok) {
-                msg.textContent = "✅ Livro cadastrado! Aguardando aprovação do administrador.";
+                msg.textContent = "✅ Livro cadastrado com sucesso!";
                 msg.className = "mensagem sucesso";
                 form.reset();
                 carregarLivros();
@@ -91,10 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <td>${livro.autor}</td>
                     <td>${livro.genero}</td>
                     <td>${livro.ano_publicacao}</td>
-                    <td class="acoes">
-                        <button class="btn-editar" data-id="${livro.id}">✏️ Editar</button>
-                        <button class="btn-excluir" data-id="${livro.id}">🗑️ Excluir</button>
-                    </td>
+                    ${getAcoesHTML(livro)}
                 `;
                 tabela.appendChild(linha);
             });
@@ -104,8 +115,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // --- ABRIR MODAL DE EDIÇÃO ---
+    // --- ABRIR MODAL DE EDIÇÃO (só funciona para admin) ---
     tabela.addEventListener("click", async (e) => {
+        // ✅ Verifica se é admin antes de permitir edição/exclusão
+        if (typeof isAdmin === 'undefined' || !isAdmin) {
+            return; // Não faz nada se não for admin
+        }
+
         // Editar
         if (e.target.classList.contains("btn-editar") || e.target.closest(".btn-editar")) {
             const btn = e.target.classList.contains("btn-editar") ? e.target : e.target.closest(".btn-editar");
@@ -243,10 +259,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <td>${livro.autor}</td>
                     <td>${livro.genero}</td>
                     <td>${livro.ano_publicacao}</td>
-                    <td class="acoes">
-                        <button class="btn-editar" data-id="${livro.id}">✏️ Editar</button>
-                        <button class="btn-excluir" data-id="${livro.id}">🗑️ Excluir</button>
-                    </td>
+                    ${getAcoesHTML(livro)}
                 `;
                 tabela.appendChild(linha);
             });

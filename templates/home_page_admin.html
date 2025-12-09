@@ -7,6 +7,7 @@
     <title>Acervo - Painel do Administrador</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
+
     <style>
         .admin-welcome {
             background: linear-gradient(135deg, #4a90e2, #357abd);
@@ -379,112 +380,104 @@
             .btn {
                 width: 100%;
             }
-
-    /* ============================================
-   CORREÇÕES DE CORES - ADMIN
-   ============================================ */
-
-/* Boas-vindas - texto branco em fundo azul */
-.admin-welcome h1,
-.admin-welcome p {
-    color: white !important;
-}
-
-/* Títulos das seções - azul escuro */
-.section-title {
-    color: #2c3e50 !important;
-    background: transparent !important;
-}
-
-.section-title > span:first-child {
-    color: #2c3e50 !important;
-}
-
-/* Badges de contagem */
-.section-title .badge {
-    color: white !important;
-    background: #e74c3c !important;
-}
-
-/* Cards de estatísticas */
-.stat-card {
-    background: white !important;
-}
-
-.stat-numero {
-    color: #2c3e50 !important;
-}
-
-.stat-card.alerta .stat-numero {
-    color: #e67e22 !important;
-}
-
-.stat-card.sucesso .stat-numero {
-    color: #27ae60 !important;
-}
-
-.stat-card.info .stat-numero {
-    color: #3498db !important;
-}
-
-.stat-label {
-    color: #7f8c8d !important;
-}
-
-/* Cards de livros */
-.livro-info h3 {
-    color: #2c3e50 !important;
-}
-
-.livro-info p {
-    color: #7f8c8d !important;
-}
-
-.livro-card-meta {
-    color: #7f8c8d !important;
-    background: #f8f9fa !important;
-}
-
-/* Links rápidos */
-.quick-link {
-    background: white !important;
-}
-
-.quick-link .icon {
-    color: #3498db !important;
-}
-
-.quick-link h4 {
-    color: #2c3e50 !important;
-}
-
-.quick-link p {
-    color: #7f8c8d !important;
-}
-
-/* Empty state */
-.empty-state {
-    background: white !important;
-}
-
-.empty-state h3 {
-    color: #27ae60 !important;
-}
-
-.empty-state p {
-    color: #7f8c8d !important;
-}
-
-/* Loading */
-.loading {
-    color: #3498db !important;
-}
-
-/* Main background override */
-main.fade-in {
-    background: transparent !important;
-}
         }
+
+        .admin-welcome h1, .admin-welcome p {
+            color: white;
+            }
+
+        .section-title {
+            color: #2c3e50;
+            background: transparent;
+        }
+
+        .section-title > span:first-child {
+            color: #2c3e50;
+        }
+
+        .section-title .badge {
+            color: white;
+            background: #e74c3c;
+        }
+
+        .stat-card {
+            background: white;
+        }
+
+        .stat-numero {
+            color: #2c3e50;
+        }
+
+        .stat-card.alerta .stat-numero {
+            color: #e67e22;
+        }
+
+        .stat-card.sucesso .stat-numero {
+            color: #27ae60;
+        }
+
+        .stat-card.info .stat-numero {
+            color: #3498db;
+        }
+
+        .stat-label {
+            color: #7f8c8d;
+        }
+
+        /* Cards de livros */
+        .livro-info h3 {
+            color: #2c3e50;
+        }
+
+        .livro-info p {
+            color: #7f8c8d;
+        }
+
+        .livro-card-meta {
+            color: #7f8c8d;
+            background: #f8f9fa;
+        }
+
+        /* Links rápidos */
+        .quick-link {
+            background: white;
+        }
+
+        .quick-link .icon {
+            color: #3498db;
+        }
+
+        .quick-link h4 {
+            color: #2c3e50;
+        }
+
+        .quick-link p {
+            color: #7f8c8d;
+        }
+
+        /* Empty state */
+        .empty-state {
+            background: white;
+        }
+
+        .empty-state h3 {
+            color: #27ae60;
+        }
+
+        .empty-state p {
+            color: #7f8c8d;
+        }
+
+        /* Loading */
+        .loading {
+            color: #3498db;
+        }
+
+        /* Main background override */
+        main.fade-in {
+            background: transparent;
+        }
+
     </style>
 </head>
 
@@ -496,7 +489,7 @@ main.fade-in {
         </div>
         <nav>
             <a href="/home_page_admin">Início</a>
-            <a href="/crudes_livros">Todos os Livros</a>
+            <a href="/crudes_livros">Cadastro de livros</a>
             <a href="/perfil">Perfil</a>
             <a href="/sobre">Sobre nós</a>
         </nav>
@@ -629,7 +622,7 @@ main.fade-in {
                 <h4>Links rápidos</h4>
                 <ul>
                     <li><a href="/home_page_admin">Painel Admin</a></li>
-                    <li><a href="/crudes_livros">Gerenciar Livros</a></li>
+                    <li><a href="/crudes_livros">Cadastrar livros</a></li>
                     <li><a href="/sobre">Sobre nós</a></li>
                 </ul>
             </div>

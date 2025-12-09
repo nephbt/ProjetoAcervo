@@ -10,6 +10,7 @@ from tests.test_login_jwt import SECRET_KEY
 def client():
     return app.test_client()
 
+
 class LivroMock:
     def __init__(self, id, titulo, autor, genero, ano_publicacao):
         self.id = id
@@ -60,6 +61,8 @@ class LivroMock:
         assert data["genero"] == "Aventura"
         assert data["ano_publicacao"] == "2020"
 """
+
+
 def test_cadastro_livro(client):
     payload = {
         "id": "123",
@@ -72,7 +75,7 @@ def test_cadastro_livro(client):
     with patch("controllers.livros_controller.get_connection") as mock_conn:
         mock_cursor = MagicMock()
         mock_conn.return_value.__enter__.return_value.cursor.return_value = mock_cursor
-        
+
         # Simular INSERT RETURNING
         mock_cursor.fetchone.return_value = (
             "livro-123",  # id
@@ -97,7 +100,7 @@ def test_cadastro_livro(client):
 
         assert response.status_code == 201
         data = response.get_json()
-        
+
         assert "mensagem" in data
         assert "livro" in data
         assert data["livro"]["titulo"] == "Livro Mockado"

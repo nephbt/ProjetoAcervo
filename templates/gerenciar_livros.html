@@ -41,7 +41,8 @@
         }
 
         .form-group input,
-        .form-group textarea {
+        .form-group textarea,
+        .form-group select {
             width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
@@ -188,6 +189,11 @@
             display: block;
         }
 
+        .logo img {
+            height: 60px;
+            border-radius: 5px;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -223,20 +229,22 @@
         .fechar:hover {
             color: #000;
         }
+
+        /* Esconder elementos para não-admin */
+        .somente-admin {
+            display: none;
+        }
     </style>
 </head>
 
 <body>
-    <!-- Cabeçalho -->
+    <!-- Cabeçalho - será ajustado pelo JS -->
     <header>
         <div id="logo">
             <img src="static/images/logo.png" alt="Logo da Biblioteca">
         </div>
-        <nav>
-            <a href="/home_page_usuarios">Início</a>
-            <a href="/minhas_leituras">Adicionar leituras</a>
-            <a href="/perfil">Perfil</a>
-            <a href="/sobre">Sobre nós</a>
+        <nav id="nav-principal">
+            <!-- Links serão inseridos via JS -->
         </nav>
     </header>
 
@@ -262,7 +270,17 @@
                     </div>
                     <div class="form-group">
                         <label>Gênero: *</label>
-                        <input type="text" name="genero" required>
+                        <select name="genero" id="genero" required>
+                            <option value="">Selecione um gênero</option>
+                            <option value="Romance">Romance</option>
+                            <option value="Poesia">Poesia</option>
+                            <option value="Fantasia">Fantasia</option>
+                            <option value="Suspense">Suspense</option>
+                            <option value="Terror">Terror</option>
+                            <option value="Ficção Científica">Ficção Científica</option>
+                            <option value="Não-ficção">Não-ficção</option>
+                            <option value="Aventura">Aventura</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label>Ano de Publicação: *</label>
@@ -298,7 +316,7 @@
                         <th>Autor</th>
                         <th>Gênero</th>
                         <th>Ano</th>
-                        <th>Ações</th>
+                        <th class="coluna-acoes somente-admin">Ações</th>
                     </tr>
                 </thead>
                 <tbody id="tabelaLivros">
@@ -310,7 +328,7 @@
         </div>
     </main>
 
-    <!-- Modal de Edição -->
+    <!-- Modal de Edição (somente admin verá) -->
     <div id="modalEditar" class="modal">
         <div class="modal-content">
             <span class="fechar" id="fecharModal">&times;</span>
@@ -330,7 +348,17 @@
 
                 <div class="form-group">
                     <label>Gênero:</label>
-                    <input type="text" id="editarGenero" required>
+                    <select id="editarGenero" required>
+                        <option value="">Selecione um gênero</option>
+                        <option value="Romance">Romance</option>
+                        <option value="Poesia">Poesia</option>
+                        <option value="Fantasia">Fantasia</option>
+                        <option value="Suspense">Suspense</option>
+                        <option value="Terror">Terror</option>
+                        <option value="Ficção Científica">Ficção Científica</option>
+                        <option value="Não-ficção">Não-ficção</option>
+                        <option value="Aventura">Aventura</option>
+                    </select>
                 </div>
 
                 <div class="form-group">
@@ -360,10 +388,8 @@
 
             <div class="footer-section links">
                 <h4>Links rápidos</h4>
-                <ul>
-                    <li><a href="/home_page_usuarios">Início</a></li>
-                    <li><a href="/livros">Livros</a></li>
-                    <li><a href="/sobre">Sobre nós</a></li>
+                <ul id="footer-links">
+                    <!-- Links serão inseridos via JS -->
                 </ul>
             </div>
 
@@ -383,8 +409,89 @@
         </div>
     </footer>
 
+    <script>
+    // Variável global para saber se é admin
+    let isAdmin = false;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const token = localStorage.getItem('token');
+        const nav = document.getElementById('nav-principal');
+        const footerLinks = document.getElementById('footer-links');
+
+        if (!token) {
+            window.location.href = '/login_usuario';
+            return;
+        }
+
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+
+            // Verifica se token expirou
+            const agora = Math.floor(Date.now() / 1000);
+            if (payload.exp && payload.exp < agora) {
+                localStorage.removeItem('token');
+                window.location.href = '/login_usuario';
+                return;
+            }
+
+            isAdmin = payload.role === 'admin';
+            const homePage = isAdmin ? '/home_page_admin' : '/home_page_usuarios';
+
+            // ✅ Configura header baseado no role
+            if (isAdmin) {
+                nav.innerHTML = `
+                    <a href="/home_page_admin">Início</a>
+                    <a href="/perfil">Perfil</a>
+                    <a href="/sobre">Sobre nós</a>
+                    <span class="admin-badge" style="background: #e74c3c; color: white; padding: 5px 10px; border-radius: 5px; font-size: 0.8em; margin-left: 10px;">🛡️ Admin</span>
+                `;
+                footerLinks.innerHTML = `
+                    <li><a href="/home_page_admin">Início</a></li>
+                    <li><a href="/crudes_livros">Gerenciar Livros</a></li>
+                    <li><a href="/sobre">Sobre nós</a></li>
+                `;
+
+                // ✅ Mostra elementos somente-admin
+                document.querySelectorAll('.somente-admin').forEach(el => {
+                    el.style.display = '';
+                });
+            } else {
+                nav.innerHTML = `
+                    <a href="/home_page_usuarios">Início</a>
+                    <a href="/minhas_leituras">Adicionar leituras</a>
+                    <a href="/perfil">Perfil</a>
+                    <a href="/sobre">Sobre nós</a>
+                `;
+                footerLinks.innerHTML = `
+                    <li><a href="/home_page_usuarios">Início</a></li>
+                    <li><a href="/minhas_leituras">Adicionar leituras</a></li>
+                    <li><a href="/sobre">Sobre nós</a></li>
+                `;
+
+                // ✅ Esconde elementos somente-admin (já está hidden por CSS)
+            }
+
+        } catch (e) {
+            console.error('Erro ao verificar role:', e);
+            window.location.href = '/login_usuario';
+        }
+    });
+
+    // ✅ Função global para verificar se deve mostrar botões de ação
+    function getAcoesHTML(livro) {
+        if (isAdmin) {
+            return `
+                <td class="acoes">
+                    <button class="btn-editar" onclick="abrirModalEditar('${livro.id}', '${livro.titulo}', '${livro.autor}', '${livro.genero}', ${livro.ano_publicacao}, '${livro.imagem_url || ''}')">✏️ Editar</button>
+                    <button class="btn-excluir" onclick="excluirLivro('${livro.id}')">🗑️ Excluir</button>
+                </td>
+            `;
+        }
+        return ''; // Não mostra nada para usuário comum
+    }
+    </script>
+
     <script src="{{ url_for('static', filename='js/gerenciar_livros.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/nav_helper.js') }}"></script>
 </body>
 
 </html>
