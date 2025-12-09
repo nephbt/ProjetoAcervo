@@ -1,12 +1,19 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles1.css') }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Adicionar leituras</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
 </head>
+
+<style>
+    .logo img {
+            height: 60px;
+            border-radius: 5px;
+    }
+</style>
 
 <body>
     <!-- Cabeçalho -->
@@ -102,6 +109,31 @@
 
         document.addEventListener("DOMContentLoaded", () => {
             console.log('🚀 Iniciando Minhas Leituras...');
+
+            // ✅ VERIFICA LOGIN E BLOQUEIA ADMIN
+            const token = localStorage.getItem("token");
+            if (!token) {
+                alert("Você precisa estar logado!");
+                window.location.href = "/login_usuario";
+                return;
+            }
+
+            try {
+                const payload = JSON.parse(atob(token.split(".")[1]));
+
+                // ✅ BLOQUEIA ADMIN
+                if (payload.role === 'admin') {
+                    alert('Administradores não têm acesso a esta página.');
+                    window.location.href = '/home_page_admin';
+                    return;
+                }
+            } catch (e) {
+                alert("Sessão inválida. Faça login novamente.");
+                localStorage.removeItem("token");
+                window.location.href = "/login_usuario";
+                return;
+            }
+
             iniciarMinhasLeituras();
 
             // Pesquisa de livros
@@ -125,13 +157,7 @@
             const sliderAvaliacao = document.getElementById("avaliacao-slider");
             const notaSelecionada = document.getElementById("notaSelecionada");
 
-            // Pegar token do localStorage
             const token = localStorage.getItem("token");
-            if (!token) {
-                alert("Você precisa estar logado!");
-                window.location.href = "/login_usuario";
-                return;
-            }
 
             console.log('🔑 Token encontrado');
 

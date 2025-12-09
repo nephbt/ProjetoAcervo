@@ -131,7 +131,7 @@ def registrarLeitura(usuario_id, livro_id, token_usuario_id, token_role, **kwarg
                 livro_id,
                 data.get("status", "quero_ler"),
                 data.get("avaliacao"),
-                datetime.now(),
+                data.get("data_leitura") or datetime.now(),
                 data.get("comentario")
             ))
 
