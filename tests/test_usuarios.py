@@ -1,10 +1,9 @@
 from datetime import datetime, timedelta, timezone
 import jwt
 import pytest
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 from app import app
-from controllers.auth_utils import key as SECRET_KEY
-
+from controllers.auth_utils import SECRET_KEY
 
 @pytest.fixture
 def client():
@@ -22,10 +21,10 @@ def test_cadastro_usuario_sucesso(client):
                 "nome": "Teste",
                 "email": "teste@teste.com",
                 "data_nasc": "2000-01-01",
+                "role": "usuario"
             }
 
-    with patch("controllers.usuarios_controller.bd.cadastrarUsuario",
-               return_value=UsuarioFake()):
+    with patch("controllers.usuarios_controller.bd.cadastrarUsuario", return_value=UsuarioFake()):
         response = client.post(
             "/usuarios/cadastro",
             json={
@@ -69,12 +68,12 @@ def test_login_usuario_sucesso(client):
         id = "123"
         nome = "Teste"
         email = "teste@teste.com"
+        role = "usuario"
 
         def verificar_senha(self, senha):
             return senha == "123456"
 
-    with patch("controllers.usuarios_controller.bd.buscarEmail",
-               return_value=UsuarioFake()):
+    with patch("controllers.usuarios_controller.bd.buscarEmail", return_value=UsuarioFake()):
         response = client.post(
             "/usuarios/login",
             json={"email": "teste@teste.com", "senha": "123456"},
@@ -92,17 +91,33 @@ def test_login_usuario_sucesso(client):
 def test_rota_perfil_autenticada(client):
     payload = {
         "id": "123",
+        "role": "usuario",
         "exp": datetime.now(timezone.utc) + timedelta(hours=2),
     }
 
     token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
 
-    response = client.get(
-        "/usuarios/perfil",
-        headers={"Authorization": f"Bearer {token}"}
-    )
+    # Mock da conexão com o banco (usado pela rota /perfil)
+    with patch("controllers.usuarios_controller.get_connection") as mock_conn:
+        mock_cursor = MagicMock()
+        mock_conn.return_value.__enter__.return_value.cursor.return_value = mock_cursor
+        
+        # Simular SELECT do usuário
+        mock_cursor.fetchone.return_value = (
+            "123",  # id
+            "Teste",  # nome
+            "teste@teste.com",  # email
+            "2000-01-01",  # data_nasc
+            "usuario"  # role
+        )
 
-    assert response.status_code == 200
+        response = client.get(
+            "/usuarios/perfil",
+            headers={"Authorization": f"Bearer {token}"}
+        )
 
-    data = response.get_json()
-    assert data["mensagem"] == "Bem-vindo usuário 123!"
+        assert response.status_code == 200
+        data = response.get_json()
+        assert data["id"] == "123"
+        assert data["nome"] == "Teste"
+        assert data["email"] == "teste@teste.com"

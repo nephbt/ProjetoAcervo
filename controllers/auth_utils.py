@@ -7,7 +7,7 @@ import os
 from dbpostgres import bd, get_connection
 
 SECRET_KEY = os.getenv("JWT_SECRET_KEY", "chave_bem_secreta")
-
+key = SECRET_KEY
 
 # ----------------------------
 # Gerar Token JWT

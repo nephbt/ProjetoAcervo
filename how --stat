@@ -1,0 +1,225 @@
+[33mcommit 75c81ee6561374224ae4ccbce17b2642a4baae5a[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: Bruno <bteles400@gmail.com>
+Date:   Thu Nov 27 23:51:10 2025 -0300
+
+    fix: Ajusta step no CI/CD
+
+[1mdiff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml[m
+[1mindex c2dc983..6ef2ce5 100644[m
+[1m--- a/.github/workflows/ci.yml[m
+[1m+++ b/.github/workflows/ci.yml[m
+[36m@@ -96,5 +96,5 @@[m [mjobs:[m
+         env:[m
+           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}[m
+         run: |[m
+[31m-          railway up --service ProjetoAcervo -- --yes[m
+[32m+[m[32m          railway up --service ProjetoAcervo[m
+   [m
+
+[33mcommit 6f5959d802dc187002c198661ccc6692e8d5ce88[m
+Author: Bruno <bteles400@gmail.com>
+Date:   Thu Nov 27 23:47:25 2025 -0300
+
+    fix: Ajusta step no CI/CD
+
+[1mdiff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml[m
+[1mindex a646578..c2dc983 100644[m
+[1m--- a/.github/workflows/ci.yml[m
+[1m+++ b/.github/workflows/ci.yml[m
+[36m@@ -96,5 +96,5 @@[m [mjobs:[m
+         env:[m
+           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}[m
+         run: |[m
+[31m-          railway up --service ProjetoAcervo --yes[m
+[32m+[m[32m          railway up --service ProjetoAcervo -- --yes[m
+   [m
+
+[33mcommit 6f56517ae00f8f252587b17e287a9cbb53426ece[m
+Author: Bruno <bteles400@gmail.com>
+Date:   Thu Nov 27 23:43:24 2025 -0300
+
+    fix: Ajusta step no CI/CD
+
+[1mdiff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml[m
+[1mindex be99c8a..a646578 100644[m
+[1m--- a/.github/workflows/ci.yml[m
+[1m+++ b/.github/workflows/ci.yml[m
+[36m@@ -92,11 +92,6 @@[m [mjobs:[m
+           curl -fsSL https://railway.app/install.sh | sh[m
+           echo "$HOME/.railway/bin" >> $GITHUB_PATH[m
+ [m
+[31m-      - name: Login no Railway[m
+[31m-        env:[m
+[31m-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}[m
+[31m-        run: railway login --token "$RAILWAY_TOKEN"[m
+[31m-[m
+       - name: Deploy para Railway[m
+         env:[m
+           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}[m
+
+[33mcommit c390d12295e02be01fa723db151eb11d43af193b[m
+Merge: d980a56 a9e5bf8
+Author: Bruno <145134344+nephbt@users.noreply.github.com>
+Date:   Thu Nov 27 23:39:22 2025 -0300
+
+    Merge pull request #26 from nephbt/banco
+    
+    Banco
+
+[33mcommit a9e5bf84020711e477f75320a7f808c5cc94e288[m[33m ([m[1;31morigin/banco[m[33m)[m
+Author: Bruno <bteles400@gmail.com>
+Date:   Thu Nov 27 23:30:37 2025 -0300
+
+    fix: Ajusta a rota usuarios
+
+[1mdiff --git a/controllers/usuarios_controller.py b/controllers/usuarios_controller.py[m
+[1mindex 51ba12d..37321ff 100644[m
+[1m--- a/controllers/usuarios_controller.py[m
+[1m+++ b/controllers/usuarios_controller.py[m
+[36m@@ -75,5 +75,5 @@[m [mdef retornarUsuario():[m
+ # -------------------------------------[m
+ @usuariosRoute.route("/perfil", methods=["GET"])[m
+ @requerir_token[m
+[31m-def perfil(id_usuario):[m
+[31m-    return jsonify({"mensagem": f"Bem-vindo usuário {id_usuario}!"}), 200[m
+[32m+[m[32mdef perfil(usuario_id):[m
+[32m+[m[32m    return jsonify({"mensagem": f"Bem-vindo usuário {usuario_id}!"}), 200[m
+
+[33mcommit 66011dc56cc050d4d9136dfe889768c5b9240be1[m
+Author: Bruno <bteles400@gmail.com>
+Date:   Thu Nov 27 23:23:59 2025 -0300
+
+    fix: Ajusta auth_utils
+
+[1mdiff --git a/controllers/auth_utils.py b/controllers/auth_utils.py[m
+[1mindex f1ae5a1..938ebad 100644[m
+[1m--- a/controllers/auth_utils.py[m
+[1m+++ b/controllers/auth_utils.py[m
+[36m@@ -52,9 +52,7 @@[m [mdef verificar_usuario(f):[m
+     @wraps(f)[m
+     def decorator(*args, **kwargs):[m
+         usuario_id = kwargs.get("usuario_id")[m
+[31m-[m
+[31m-        # Agora a busca vem do Postgres[m
+[31m-        usuario = bd.buscarUsuarioPorId(usuario_id)[m
+[32m+[m[32m        usuario = bd.usuarios.get(usuario_id)[m
+ [m
+         if not usuario:[m
+             return jsonify({"Erro": "Usuário não encontrado"}), 404[m
+
+[33mcommit dcac29f86c214ae7440e86eafe80a704919ad334[m
+Author: Bruno <bteles400@gmail.com>
+Date:   Thu Nov 27 23:16:33 2025 -0300
+
+    fix: Ajustes no banco
+
+[1mdiff --git a/dbpostgres.py b/dbpostgres.py[m
+[1mindex 74df98e..2dd9437 100644[m
+[1m--- a/dbpostgres.py[m
+[1m+++ b/dbpostgres.py[m
+[36m@@ -9,7 +9,14 @@[m [mfrom models import Livro, Usuario, Leitura[m
+ [m
+ [m
+ def get_connection():[m
+[31m-    return psycopg2.connect(os.environ["DATABASE_URL"], sslmode="require")[m
+[32m+[m[32m    url = os.environ["DATABASE_URL"][m
+[32m+[m
+[32m+[m[32m    # Railway sempre precisa de SSL[m
+[32m+[m[32m    if "railway" in url or "internal" in url:[m
+[32m+[m[32m        return psycopg2.connect(url, sslmode="require")[m
+[32m+[m
+[32m+[m[32m    # Local (GitHub Actions, sua máquina): sem SSL[m
+[32m+[m[32m    return psycopg2.connect(url, sslmode="disable")[m
+ [m
+ [m
+ def criar_tabelas():[m
+
+[33mcommit 28a8d3a63927bb6692d29f6d4d9f2770523d71fd[m
+Author: Bruno <bteles400@gmail.com>
+Date:   Thu Nov 27 23:13:11 2025 -0300
+
+    fix: Ajustes no CI/CD
+
+[1mdiff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml[m
+[1mindex a915658..be99c8a 100644[m
+[1m--- a/.github/workflows/ci.yml[m
+[1m+++ b/.github/workflows/ci.yml[m
+[36m@@ -50,11 +50,6 @@[m [mjobs:[m
+           pip install --upgrade pip[m
+           pip install -r requirements.txt[m
+ [m
+[31m-      - name: Criar estrutura do banco[m
+[31m-        run: |[m
+[31m-          apt-get update && apt-get install -y postgresql-client[m
+[31m-          psql $DATABASE_URL -f db/init.sql[m
+[31m-[m
+       - name: Lint[m
+         run: |[m
+           pip install flake8[m
+[36m@@ -102,14 +97,6 @@[m [mjobs:[m
+           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}[m
+         run: railway login --token "$RAILWAY_TOKEN"[m
+ [m
+[31m-      - name: Criar tabelas no Postgres da Railway[m
+[31m-        env:[m
+[31m-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}[m
+[31m-          DATABASE_URL: ${{ secrets.RAILWAY_DATABASE_URL }}[m
+[31m-        run: |[m
+[31m-          railway run --service ProjetoAcervo "psql \"${DATABASE_URL}\" -f db/init.sql"[m
+[31m-[m
+[31m-[m
+       - name: Deploy para Railway[m
+         env:[m
+           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}[m
+
+[33mcommit d6a17d1c43bb8c05fad32e15b7c4f3b9ceda4aa4[m
+Author: Bruno <bteles400@gmail.com>
+Date:   Thu Nov 27 23:05:41 2025 -0300
+
+    fix: Ajustes no CI/CD
+
+[1mdiff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml[m
+[1mindex f366bad..a915658 100644[m
+[1m--- a/.github/workflows/ci.yml[m
+[1m+++ b/.github/workflows/ci.yml[m
+[36m@@ -11,6 +11,25 @@[m [mon:[m
+ jobs:[m
+   build-and-test:[m
+     runs-on: ubuntu-latest[m
+[32m+[m
+[32m+[m[32m    services:[m
+[32m+[m[32m      postgres:[m
+[32m+[m[32m        image: postgres:15[m
+[32m+[m[32m        env:[m
+[32m+[m[32m          POSTGRES_USER: acervo_user[m
+[32m+[m[32m          POSTGRES_PASSWORD: acervo_pass[m
+[32m+[m[32m          POSTGRES_DB: acervo_db[m
+[32m+[m[32m        ports:[m
+[32m+[m[32m          - 5432:5432[m
+[32m+[m[32m        options: >-[m
+[32m+[m[32m          --health-cmd="pg_isready -U acervo_user -d acervo_db"[m
+[32m+[m[32m          --health-interval=10s[m
+[32m+[m[32m          --health-timeout=5s[m
+[32m+[m[32m          --health-retries=5[m
+[32m+[m
+[32m+[m[32m    env:[m
+[32m+[m[32m      DATABASE_URL: postgresql://acervo_user:acervo_pass@localhost:5432/acervo_db[m
+[32m+[m
+     steps:[m
+       - name: Checkout[m
+         uses: actions/checkout@v4[m
+[36m@@ -25,14 +44,17 @@[m [mjobs:[m
+         with:[m
+           path: ~/.cache/pip[m
+           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}[m
+[31m-          restore-keys: |[m
+[31m-            ${{ runner.os }}-pip-[m
+ [m
+       - name: Instalar dependências[m
+         run: |[m
+[31m-          python -m pip install --upgrade pip[m
+[32m+[m[32m          pip install --upgrade pip[m
+           pip install -r requirements.txt[m
+ [m
+[32m+[m[32m      - name: Criar estrutura do banco[m
+[32m+[m[32m        run: |
