@@ -26,4 +26,3 @@ psycopg[binary]==3.2.13
 python-dotenv==1.0.1
 numpy
 scikit-learn
-psycopg_pool=3.2.13
