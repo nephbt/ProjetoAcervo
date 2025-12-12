@@ -108,7 +108,7 @@ def matriz_similaridade_itens(vetores, ids):
 # 2. Recomendação item-based
 # ============================================================
 
-def recomendar_item_based(usuario_id, bd, num_recomendacoes=6, k=15):
+def recomendar_item_based(usuario_id, bd, num_recomendacoes=6, k=7):
     """
     Recomenda livros baseado em item similarity.
     """
@@ -169,7 +169,7 @@ def recomendar_item_based(usuario_id, bd, num_recomendacoes=6, k=15):
     return recomendados[:num_recomendacoes]
 
 
-def recomendar_livros_knn(usuario_id, bd, num_recomendacoes=6, n_neighbors=10):
+def recomendar_livros_knn(usuario_id, bd, num_recomendacoes=6, n_neighbors=7):
     """Alias para recomendar_item_based"""
     return recomendar_item_based(usuario_id, bd, num_recomendacoes, n_neighbors)
 
@@ -250,7 +250,7 @@ def recomendar_item_based_com_treino(usuario_id, bd, livros_treino_ids, num_reco
     return recomendados[:num_recomendacoes]
 
 
-def avaliar_modelo(bd, k=5, n_folds=5):
+def avaliar_modelo(bd, k=7, n_folds=5):
     """Avalia o modelo usando k-fold cross-validation."""
 
     usuarios_com_avaliacoes = {}
